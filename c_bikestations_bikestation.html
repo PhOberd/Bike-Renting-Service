@@ -1,0 +1,43 @@
+<html>
+    <head></head>
+    <body>
+        <fieldset>
+            <legend>Bikestationname  Rating:</legend>
+            <label>Rate your Bike - Your Specifications:</label></br>
+            <label>Model</label>
+                <select name="model" id="model">
+                    <option value="default">Choose the Bikemodel</option>
+                    <option value="MB 1/4">MB 1/4</option>
+                    <option value="MB 2/4">MB 2/4</option>
+                    <option value="MB 3/4">MB 3/4</option>
+                    <option value="MB 4/4">MB 4/4</option>
+                </select></br>
+            <label>Category</label>
+                <select name="category" id="category">
+                    <option value="default">Choose the Category</option>
+                    <option value="Mountenbike">Mountenbike</option>
+                    <option value="Electricbike">Electricbike</option>
+                    <option value="Child">Child</option>
+                    <option value="normal">normal Bike</option>
+                </select> </br>
+            <label >Wheelsize</label>
+                <input type="number" id="wheelsize"  placeholder="Wheelsize" min="1" max="5"></br>  
+            <label >Timeframe:</label>  
+                <div>Starttime</div>
+                <input type='date' name='startdate' >
+                <input type="number" name='starttime' min="0" max="23">
+                <div>Endtime</div>
+                <input type='date' name='enddate' >
+                <input type="number" name='endtime' min="0" max="23">
+                    <legend>Free Bikes for your Specifications</legend>
+                    <fieldset>
+                        <label>ID</label></br>
+                        <label>Model</label></br>
+                        <label>Category</label></br>
+                        <label>Wheelsize</label> </br>
+                        <label>Price</label> </br>
+                        <button onclick="window.location.href = '//C:/Apache24/htdocs/bikerent_project/c_tickets.html';">Book</button>
+                    </fieldset>
+        </fieldset>
+    </body>
+</html>
