@@ -10,8 +10,7 @@ const jwt = require('jsonwebtoken');
 router.post('/', (req, res) => {
 
     // TODO: get login parameters from request body
-    const { email, password } = req.body;
-    console.log(`${email}  ${password}`);
+    const { email, password, isAdmin } = req.body;
     // prepare DB query
     const query = {
         text:`SELECT * FROM users WHERE email = $1 AND password = $2`,
@@ -31,8 +30,14 @@ router.post('/', (req, res) => {
 
             // everything is ok
             let resultUser = results.rows[0];
-            console.log("reached token");
-			const token = jwt.sign({userId:resultUser.id, email: resultUser.email}, cfg.auth.jwt_key, {expiresIn:cfg.auth.expiration});/* form the token with userData (accessible when decoding token), jwtkey, expiry time */;
+            console.log(results.rows[0]);
+
+            const tokenPayload = {
+                userId: resultUser.user_id,
+                email: resultUser.email,
+                isAdmin: resultUser.isadmin
+            };
+			const token = jwt.sign(tokenPayload, cfg.auth.jwt_key, {expiresIn:cfg.auth.expiration});/* form the token with userData (accessible when decoding token), jwtkey, expiry time */;
             
 			res.status(200).json({
                 "message": "login successful",
