@@ -5,7 +5,7 @@
 -- Dumped from database version 16.1
 -- Dumped by pg_dump version 16.1
 
--- Started on 2024-01-21 21:56:28
+-- Started on 2024-01-26 17:24:03
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -27,7 +27,7 @@ CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 4928 (class 0 OID 0)
+-- TOC entry 4930 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
 --
@@ -69,7 +69,7 @@ CREATE SEQUENCE public.bike_categories_category_id_seq
 ALTER SEQUENCE public.bike_categories_category_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4929 (class 0 OID 0)
+-- TOC entry 4931 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: bike_categories_category_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -112,7 +112,7 @@ CREATE SEQUENCE public.bike_models_model_id_seq
 ALTER SEQUENCE public.bike_models_model_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4930 (class 0 OID 0)
+-- TOC entry 4932 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: bike_models_model_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -153,7 +153,7 @@ CREATE SEQUENCE public.bike_stations_station_id_seq
 ALTER SEQUENCE public.bike_stations_station_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4931 (class 0 OID 0)
+-- TOC entry 4933 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: bike_stations_station_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -169,7 +169,8 @@ ALTER SEQUENCE public.bike_stations_station_id_seq OWNED BY public.bike_stations
 CREATE TABLE public.individual_bikes (
     bike_id integer NOT NULL,
     model_id integer,
-    unique_id character varying(255)
+    unique_id character varying(255),
+    station_id integer
 );
 
 
@@ -192,7 +193,7 @@ CREATE SEQUENCE public.individual_bikes_bike_id_seq
 ALTER SEQUENCE public.individual_bikes_bike_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4932 (class 0 OID 0)
+-- TOC entry 4934 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: individual_bikes_bike_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -232,7 +233,7 @@ CREATE SEQUENCE public.parking_places_place_id_seq
 ALTER SEQUENCE public.parking_places_place_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4933 (class 0 OID 0)
+-- TOC entry 4935 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: parking_places_place_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -274,7 +275,7 @@ CREATE SEQUENCE public.reviews_review_id_seq
 ALTER SEQUENCE public.reviews_review_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4934 (class 0 OID 0)
+-- TOC entry 4936 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: reviews_review_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -319,7 +320,7 @@ CREATE SEQUENCE public.tickets_ticket_id_seq
 ALTER SEQUENCE public.tickets_ticket_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4935 (class 0 OID 0)
+-- TOC entry 4937 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -336,7 +337,8 @@ CREATE TABLE public.users (
     user_id integer NOT NULL,
     email character varying(255) NOT NULL,
     password character varying(255) NOT NULL,
-    wallet numeric(8,2)
+    wallet numeric(8,2),
+    isadmin boolean DEFAULT false
 );
 
 
@@ -359,7 +361,7 @@ CREATE SEQUENCE public.users_user_id_seq
 ALTER SEQUENCE public.users_user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4936 (class 0 OID 0)
+-- TOC entry 4938 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -408,7 +410,7 @@ ALTER TABLE ONLY public.parking_places ALTER COLUMN place_id SET DEFAULT nextval
 
 
 --
--- TOC entry 4732 (class 2604 OID 16494)
+-- TOC entry 4733 (class 2604 OID 16494)
 -- Name: reviews review_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -432,7 +434,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 
 
 --
--- TOC entry 4910 (class 0 OID 16408)
+-- TOC entry 4912 (class 0 OID 16408)
 -- Dependencies: 219
 -- Data for Name: bike_categories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -446,41 +448,43 @@ COPY public.bike_categories (category_id, name) FROM stdin;
 
 
 --
--- TOC entry 4912 (class 0 OID 16415)
+-- TOC entry 4914 (class 0 OID 16415)
 -- Dependencies: 221
 -- Data for Name: bike_models; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.bike_models (model_id, name, category_id, description, wheel_size, manufacturer, brake_type) FROM stdin;
-21	Model 1	9	Mountain Bike Model 1	26	Brand A	Disc
-22	Model 2	10	Electric Bike Model 1	28	Brand B	Drum
+1	Model 1	9	Mountain Bike Model 1	26	Brand A	Disc
+2	Model 2	10	Electric Bike Model 1	28	Brand B	Drum
 \.
 
 
 --
--- TOC entry 4908 (class 0 OID 16399)
+-- TOC entry 4910 (class 0 OID 16399)
 -- Dependencies: 217
 -- Data for Name: bike_stations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.bike_stations (station_id, name, address, latitude, longitude) FROM stdin;
-11	Station 1	Address 1	46.372700	14.181700
-12	Station 2	Address 2	46.371000	14.262400
+11	Station1	Address1	46.372700	14.181700
+12	Station2	Address2	46.371000	14.262400
 \.
 
 
 --
--- TOC entry 4914 (class 0 OID 16429)
+-- TOC entry 4916 (class 0 OID 16429)
 -- Dependencies: 223
 -- Data for Name: individual_bikes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.individual_bikes (bike_id, model_id, unique_id) FROM stdin;
+COPY public.individual_bikes (bike_id, model_id, unique_id, station_id) FROM stdin;
+1	1	MTN001	11
+2	2	EL001	12
 \.
 
 
 --
--- TOC entry 4916 (class 0 OID 16443)
+-- TOC entry 4918 (class 0 OID 16443)
 -- Dependencies: 225
 -- Data for Name: parking_places; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -494,39 +498,44 @@ COPY public.parking_places (place_id, station_id, number, category_id) FROM stdi
 
 
 --
--- TOC entry 4922 (class 0 OID 16491)
+-- TOC entry 4924 (class 0 OID 16491)
 -- Dependencies: 231
 -- Data for Name: reviews; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) FROM stdin;
+1	1	1	11	5	Cool!
+2	2	2	12	4	Jo geht eh!
 \.
 
 
 --
--- TOC entry 4918 (class 0 OID 16462)
+-- TOC entry 4920 (class 0 OID 16462)
 -- Dependencies: 227
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_time, price, status) FROM stdin;
+1	1	1	9	2024-01-20 10:00:00	2024-01-20 12:00:00	15.00	Active
+2	2	2	10	2024-01-21 15:00:00	2024-01-21 17:00:00	10.00	Active
 \.
 
 
 --
--- TOC entry 4920 (class 0 OID 16480)
+-- TOC entry 4922 (class 0 OID 16480)
 -- Dependencies: 229
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (user_id, email, password, wallet) FROM stdin;
-1	user1@example.com	password1	0.00
-2	user2@example.com	password2	100.00
+COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
+2	user2@example.com	password2	100.00	f
+1	user1@example.com	password1	0.00	f
+3	admin	admin	0.00	t
 \.
 
 
 --
--- TOC entry 4937 (class 0 OID 0)
+-- TOC entry 4939 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: bike_categories_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -535,7 +544,7 @@ SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 12, true);
 
 
 --
--- TOC entry 4938 (class 0 OID 0)
+-- TOC entry 4940 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: bike_models_model_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -544,7 +553,7 @@ SELECT pg_catalog.setval('public.bike_models_model_id_seq', 22, true);
 
 
 --
--- TOC entry 4939 (class 0 OID 0)
+-- TOC entry 4941 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: bike_stations_station_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -553,7 +562,7 @@ SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 12, true);
 
 
 --
--- TOC entry 4940 (class 0 OID 0)
+-- TOC entry 4942 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: individual_bikes_bike_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -562,7 +571,7 @@ SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 3, true);
 
 
 --
--- TOC entry 4941 (class 0 OID 0)
+-- TOC entry 4943 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: parking_places_place_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -571,7 +580,7 @@ SELECT pg_catalog.setval('public.parking_places_place_id_seq', 20, true);
 
 
 --
--- TOC entry 4942 (class 0 OID 0)
+-- TOC entry 4944 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: reviews_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -580,7 +589,7 @@ SELECT pg_catalog.setval('public.reviews_review_id_seq', 1, false);
 
 
 --
--- TOC entry 4943 (class 0 OID 0)
+-- TOC entry 4945 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -589,7 +598,7 @@ SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, false);
 
 
 --
--- TOC entry 4944 (class 0 OID 0)
+-- TOC entry 4946 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -598,7 +607,7 @@ SELECT pg_catalog.setval('public.users_user_id_seq', 2, true);
 
 
 --
--- TOC entry 4737 (class 2606 OID 16413)
+-- TOC entry 4738 (class 2606 OID 16413)
 -- Name: bike_categories bike_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -607,7 +616,7 @@ ALTER TABLE ONLY public.bike_categories
 
 
 --
--- TOC entry 4739 (class 2606 OID 16422)
+-- TOC entry 4740 (class 2606 OID 16422)
 -- Name: bike_models bike_models_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -616,7 +625,7 @@ ALTER TABLE ONLY public.bike_models
 
 
 --
--- TOC entry 4735 (class 2606 OID 16406)
+-- TOC entry 4736 (class 2606 OID 16406)
 -- Name: bike_stations bike_stations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -625,7 +634,7 @@ ALTER TABLE ONLY public.bike_stations
 
 
 --
--- TOC entry 4741 (class 2606 OID 16434)
+-- TOC entry 4742 (class 2606 OID 16434)
 -- Name: individual_bikes individual_bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -634,7 +643,7 @@ ALTER TABLE ONLY public.individual_bikes
 
 
 --
--- TOC entry 4743 (class 2606 OID 16436)
+-- TOC entry 4744 (class 2606 OID 16436)
 -- Name: individual_bikes individual_bikes_unique_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -643,7 +652,7 @@ ALTER TABLE ONLY public.individual_bikes
 
 
 --
--- TOC entry 4745 (class 2606 OID 16448)
+-- TOC entry 4746 (class 2606 OID 16448)
 -- Name: parking_places parking_places_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -652,7 +661,7 @@ ALTER TABLE ONLY public.parking_places
 
 
 --
--- TOC entry 4755 (class 2606 OID 16498)
+-- TOC entry 4756 (class 2606 OID 16498)
 -- Name: reviews reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -661,7 +670,7 @@ ALTER TABLE ONLY public.reviews
 
 
 --
--- TOC entry 4749 (class 2606 OID 16468)
+-- TOC entry 4750 (class 2606 OID 16468)
 -- Name: tickets tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -670,7 +679,7 @@ ALTER TABLE ONLY public.tickets
 
 
 --
--- TOC entry 4747 (class 2606 OID 16450)
+-- TOC entry 4748 (class 2606 OID 16450)
 -- Name: parking_places unique_parking_place; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -679,7 +688,7 @@ ALTER TABLE ONLY public.parking_places
 
 
 --
--- TOC entry 4751 (class 2606 OID 16489)
+-- TOC entry 4752 (class 2606 OID 16489)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -688,7 +697,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4753 (class 2606 OID 16487)
+-- TOC entry 4754 (class 2606 OID 16487)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -697,7 +706,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4756 (class 2606 OID 16423)
+-- TOC entry 4757 (class 2606 OID 16423)
 -- Name: bike_models bike_models_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -706,7 +715,7 @@ ALTER TABLE ONLY public.bike_models
 
 
 --
--- TOC entry 4757 (class 2606 OID 16437)
+-- TOC entry 4758 (class 2606 OID 16437)
 -- Name: individual_bikes individual_bikes_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -715,7 +724,16 @@ ALTER TABLE ONLY public.individual_bikes
 
 
 --
--- TOC entry 4758 (class 2606 OID 16456)
+-- TOC entry 4759 (class 2606 OID 16509)
+-- Name: individual_bikes individual_bikes_station_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.individual_bikes
+    ADD CONSTRAINT individual_bikes_station_id_fkey FOREIGN KEY (station_id) REFERENCES public.bike_stations(station_id);
+
+
+--
+-- TOC entry 4760 (class 2606 OID 16456)
 -- Name: parking_places parking_places_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -724,7 +742,7 @@ ALTER TABLE ONLY public.parking_places
 
 
 --
--- TOC entry 4759 (class 2606 OID 16451)
+-- TOC entry 4761 (class 2606 OID 16451)
 -- Name: parking_places parking_places_station_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -733,7 +751,7 @@ ALTER TABLE ONLY public.parking_places
 
 
 --
--- TOC entry 4762 (class 2606 OID 16499)
+-- TOC entry 4764 (class 2606 OID 16499)
 -- Name: reviews reviews_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -742,7 +760,7 @@ ALTER TABLE ONLY public.reviews
 
 
 --
--- TOC entry 4763 (class 2606 OID 16504)
+-- TOC entry 4765 (class 2606 OID 16504)
 -- Name: reviews reviews_station_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -751,7 +769,7 @@ ALTER TABLE ONLY public.reviews
 
 
 --
--- TOC entry 4760 (class 2606 OID 16474)
+-- TOC entry 4762 (class 2606 OID 16474)
 -- Name: tickets tickets_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -760,7 +778,7 @@ ALTER TABLE ONLY public.tickets
 
 
 --
--- TOC entry 4761 (class 2606 OID 16469)
+-- TOC entry 4763 (class 2606 OID 16469)
 -- Name: tickets tickets_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -768,7 +786,7 @@ ALTER TABLE ONLY public.tickets
     ADD CONSTRAINT tickets_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.bike_models(model_id);
 
 
--- Completed on 2024-01-21 21:56:29
+-- Completed on 2024-01-26 17:24:03
 
 --
 -- PostgreSQL database dump complete
