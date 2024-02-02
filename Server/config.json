@@ -2,7 +2,7 @@
     "database": {
         "host": "localhost",
         "user": "postgres",
-        "password": "1243",
+        "password": "12435",
         "db": "postgres"
     },
 	"auth": {

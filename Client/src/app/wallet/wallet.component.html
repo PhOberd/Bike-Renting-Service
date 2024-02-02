@@ -1,0 +1,25 @@
+<div class="wallet-container">
+    <h2>Your Wallet</h2>
+    <label>Balance: </label>
+    <span id="balance">{{balance}} EUR</span>
+
+    <form #chargeForm="ngForm" (ngSubmit)="chargeBalance(amount.value, creditCard.value)">
+    <fieldset>
+    <legend>Deposit</legend> <br>
+        <label>Credit Card Number</label>
+        <input type="text" placeholder="684684654165" name="creditCard" #creditCard> <br>
+           
+        <label>Amount (in EUR)</label><br>
+        <input type="number" placeholder="0" min="0" name="amount" #amount> <br>
+
+        <button type="submit">Charge balance</button> 
+    </fieldset>
+    </form>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+    </div>
+</div>

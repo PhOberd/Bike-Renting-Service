@@ -21,17 +21,67 @@ const checkAuth = require('./check_auth');
 const loginRoutes = require('./login');
 app.use("/login", loginRoutes);
 
+const registerRoutes = require('./register');
+app.use("/register", registerRoutes);
+
 app.get("/", (req, res) => {
     
 	// TODO: set content type (from EX1)
-    res.header('Content-Type', 'text/html');
+    res.header('Content-Type', 'application/json');
 	
     res.status(200).send("EX4: This is a database-backed application which uses JWT");
 });
 
+app.get('/wallet', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const result = await pool.query('SELECT wallet FROM users WHERE user_id = $1', [userId]);
+        
+        if(result.rows.length === 0){
+            return res.status(401).json({message:`Invalid user ID`});
+        } else {
+            const balance = result.rows[0].wallet
+            console.log(balance);
+            res.json({ balance });
+        }
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/wallet', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const { amount } = req.body;
+        const query = {
+            text: 'UPDATE users SET wallet = wallet + $1 WHERE user_id = $2',
+            values: [amount, userId],
+          };
+        
+          pool.query(query, (err, result) => {
+            if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Failed to update wallet balance' });
+            } else {
+              if (result.rowCount === 1) {
+                console.log('Wallet balance updated successfully');
+                res.status(200).json({ message: 'Wallet balance updated successfully' });
+              } else {
+                console.error('User not found or no wallet balance updated');
+                res.status(404).json({ message: 'User not found or no wallet balance updated' });
+              }
+            }
+          });
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // Code for all the stations
-
 app.get('/stations',checkAuth, async (req, res) => {
 
     try{
