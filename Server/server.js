@@ -32,6 +32,7 @@ app.get("/", (req, res) => {
 
 // Code for all the stations
 
+// route returns a list of all stations (no admin rights necessary)
 app.get('/stations',checkAuth, async (req, res) => {
 
     try{
@@ -45,7 +46,11 @@ app.get('/stations',checkAuth, async (req, res) => {
     }
 });
 
-app.post('/stations', async (req, res) => {
+//route creates a new station in the database (admin)
+app.post('/stations', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
     try {
         const { name, address, latitude, longitude } = req.body;
 
@@ -69,8 +74,80 @@ app.post('/stations', async (req, res) => {
     }
 });
 
+//route deletes an exsiting station with given id (admin)
+app.delete('/stations/:stationId', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const stationId = req.params.stationId;
+
+    try {
+        // Checking for the existance
+        const stationQuery = {
+            text: 'SELECT * FROM bike_stations WHERE station_id = $1',
+            values: [stationId]
+        };
+        const stationResult = await pool.query(stationQuery);
+
+        if (stationResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Station not found' });
+        }
+
+        // Deleting the station
+        const deleteQuery = {
+            text: 'DELETE FROM bike_stations WHERE station_id = $1',
+            values: [stationId]
+        };
+        await pool.query(deleteQuery);
+
+        res.status(200).json({ message: 'Station deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting station:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//route for updating an existent station (admin)
+app.put('/stations/:stationId',checkAuth, async (req, res) => {
+
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const stationId = req.params.stationId;
+    const { name, address, latitude, longitude } = req.body;
+
+    try {
+        // Check if the station exists
+        const stationQuery = {
+            text: 'SELECT * FROM bike_stations WHERE station_id = $1',
+            values: [stationId]
+        };
+        const stationResult = await pool.query(stationQuery);
+
+        if (stationResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Station not found' });
+        }
+
+        // Update the station
+        const updateQuery = {
+            text: 'UPDATE bike_stations SET name = $1, address = $2, latitude = $3, longitude = $4 WHERE station_id = $5',
+            values: [name, address, latitude, longitude, stationId]
+        };
+        await pool.query(updateQuery);
+
+        res.status(200).json({ message: 'Station updated successfully' });
+    } catch (error) {
+        console.error('Error updating station:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
 //routes for the categories
 
+//returning a list with all categories
 app.get('/categories',checkAuth, async (req, res) => {
 
     try{
@@ -80,6 +157,104 @@ app.get('/categories',checkAuth, async (req, res) => {
         res.json(categories);
     }catch(error){
         console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//creating a new category (admin)
+app.post('/categories', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+    try {
+        const name = req.body;
+
+        // Validate input data
+        if (!name ) {
+            return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        // Insert new category into the database
+        const query = {
+            text: 'INSERT INTO bike_categories (name) VALUES ($1) RETURNING *',
+            values: [name],
+        };
+
+        const result = await pool.query(query);
+
+        res.status(201).json({ message: 'Category created successfully', category: result.rows[0] });
+    } catch (error) {
+        console.error('Error creating category:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//route for updating an existent category (admin)
+app.put('/categories/:categoryId',checkAuth, async (req, res) => {
+
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const categoryId = req.params.categoryId;
+    const { name } = req.body;
+
+    try {
+        // Check if the category exists
+        const categoryQuery = {
+            text: 'SELECT * FROM bike_categories WHERE category_id = $1',
+            values: [categoryId]
+        };
+        const categoryResult = await pool.query(categoryQuery);
+
+        if (categoryResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Update the category
+        const updateQuery = {
+            text: 'UPDATE bike_categories SET name = $1 WHERE category_id = $5',
+            values: [name]
+        };
+        await pool.query(updateQuery);
+
+        res.status(200).json({ message: 'Category updated successfully' });
+    } catch (error) {
+        console.error('Error updating category:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//route deletes an exsiting category with given id (admin)
+app.delete('/categories/:categoryId', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const categoryId = req.params.categoryId;
+
+    try {
+        // Checking for the existance
+        const categoryQuery = {
+            text: 'SELECT * FROM bike_categories WHERE category_id = $1',
+            values: [categoryId]
+        };
+        const categoryResult = await pool.query(categoryQuery);
+
+        if (categoryResult.rows.length === 0) {
+            return res.status(404).json({ message: 'category not found' });
+        }
+
+        // Deleting the category
+        const deleteQuery = {
+            text: 'DELETE FROM bike_categories WHERE category_id = $1',
+            values: [categoryId]
+        };
+        await pool.query(deleteQuery);
+
+        res.status(200).json({ message: 'category deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting category:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
