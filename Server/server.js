@@ -51,13 +51,43 @@ app.get('/wallet', checkAuth, async (req, res) => {
     }
 });
 
-app.post('/wallet', checkAuth, async (req, res) => {
+app.post('/wallet/charge', checkAuth, async (req, res) => {
 
     try{
         const userId = req.userData.userId;
         const { amount } = req.body;
         const query = {
             text: 'UPDATE users SET wallet = wallet + $1 WHERE user_id = $2',
+            values: [amount, userId],
+          };
+        
+          pool.query(query, (err, result) => {
+            if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Failed to update wallet balance' });
+            } else {
+              if (result.rowCount === 1) {
+                console.log('Wallet balance updated successfully');
+                res.status(200).json({ message: 'Wallet balance updated successfully' });
+              } else {
+                console.error('User not found or no wallet balance updated');
+                res.status(404).json({ message: 'User not found or no wallet balance updated' });
+              }
+            }
+          });
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/wallet/use', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const { amount } = req.body;
+        const query = {
+            text: 'UPDATE users SET wallet = wallet - $1 WHERE user_id = $2',
             values: [amount, userId],
           };
         
@@ -165,7 +195,6 @@ app.get('/bikes',checkAuth, async (req, res) => {
 });
 
 //routes for assigned bikes to stations
-
 app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
 
     try {
@@ -183,7 +212,30 @@ app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
         };
 
         const result = await pool.query(query);
+        res.status(200).json({ bikes: result.rows });
+    } catch (error) {
+        console.error('Error getting bikes for the station:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
+app.get('/stations/:stationId/bike',checkAuth, async (req, res) => {
+
+    try {
+        const stationId = req.params.stationId;
+
+        // Validate stationId
+        if (!stationId || isNaN(stationId)) {
+            return res.status(400).json({ message: 'Invalid stationId' });
+        }
+
+        // Query to get bikes assigned to the specific station
+        const query = {
+            text: 'SELECT bm.model_id as model_id, bc.category_id as category_id, ib.bike_id as id, bm.name as model_name, bc.name as category_name, bm.wheel_size, bm.manufacturer, bm.brake_type, bm.pph FROM individual_bikes ib, bike_models bm, bike_categories bc WHERE station_id = $1 AND ib.model_id = bm.model_id AND bm.category_id = bc.category_id',
+            values: [stationId],
+        };
+
+        const result = await pool.query(query);
         res.status(200).json({ bikes: result.rows });
     } catch (error) {
         console.error('Error getting bikes for the station:', error);
@@ -192,7 +244,6 @@ app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
 });
 
 //routes for booking tickets
-
 app.get('/booking-tickets',checkAuth, async (req, res) => {
 
     if(req.userData.isAdmin){
@@ -220,6 +271,24 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
             console.error('Error querying database:', error);
             res.status(500).json({ message: 'Internal Server Error' });
         }
+    }
+});
+
+app.post('/booking-tickets',checkAuth, async (req, res) => {
+    const data = { category_id, end_time, model_id, price, start_time, status, user_id } = req.body.ticket;
+    console.log(data.ticket)
+    try {
+        const result = await pool.query(`
+            INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [user_id, model_id, category_id, start_time, end_time, price, status]);
+
+        const ticket = result.rows[0];
+        res.status(200).json(ticket);
+    } catch (error) {
+        console.error('Error inserting ticket into database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
@@ -285,6 +354,27 @@ app.get('/users/:userId',checkAuth, async (req, res) => {
 
     } catch (error) {
         console.error(`Error accessing database: `, error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//reviews from specific station
+app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
+
+    try{
+        const stationId = req.params.stationId;
+
+        // Validate stationId
+        if (!stationId || isNaN(stationId)) {
+            return res.status(400).json({ message: 'Invalid stationId' });
+        }
+
+        let reviews = [];
+        const result = await pool.query('SELECT rating FROM reviews WHERE station_id = $1', [stationId]);
+        reviews = result.rows;
+        res.json(reviews);
+    }catch(error){
+        console.error('Error querying database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });

@@ -1,0 +1,30 @@
+<div class="rating-container">
+<h2>Station rating:</h2> <img *ngFor="let star of stars" src="assets/star.png">
+</div>
+
+<div class="filter-container">
+  <h2>Filter</h2>
+  <select [(ngModel)]="selectedCategory" (change)="filterBikesByCategory()">
+    <option value="">All Categories</option>
+    <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+  </select>
+  
+  <select [(ngModel)]="selectedModel" (change)="filterBikesByModel()" [disabled]="!selectedCategory">
+    <option value="">All Models</option>
+    <option *ngFor="let modelName of filteredModelNames" [value]="modelName">{{ modelName }}</option>
+  </select>
+</div>
+
+<div *ngIf="bikes.length > 0">
+    <h2>List of available bikes</h2>
+    <div *ngFor="let bike of bikes">
+      <app-bike [bike]="bike" (rentNowRequest)="onRentNowRequested($event)"
+      (rentLaterRequest)="onRentLaterRequested($event)"></app-bike>
+      <app-rent-confirmation *ngIf="isRentConfirmationOpen && bike === selectedBike" 
+      [isRentNow]="isRentNow"
+      [selectedBike]="selectedBike"></app-rent-confirmation>
+  </div>
+  </div>
+  <div *ngIf="bikes.length === 0">
+    <p>No bikes found.</p>
+</div>

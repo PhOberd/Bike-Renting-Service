@@ -21,6 +21,13 @@ export class WalletService {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.post<any>(this.walletUrl, { amount }, { headers });
+    return this.http.post<any>(`${this.walletUrl}/charge`, { amount }, { headers });
+  }
+
+  useBalance(token: string, amount: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.post<any>(`${this.walletUrl}/use`, { amount }, { headers });
   }
 }

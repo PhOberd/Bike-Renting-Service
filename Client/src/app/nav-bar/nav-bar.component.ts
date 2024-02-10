@@ -26,7 +26,7 @@ export class NavBarComponent {
   }
 
   navigateToBikeStations() {
-    this.router.navigateByUrl('/bikestations');
+    this.router.navigateByUrl('/stations');
   }
 
   navigateToWallet() {

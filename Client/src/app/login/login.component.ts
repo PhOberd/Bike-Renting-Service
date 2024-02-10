@@ -23,7 +23,7 @@ export class LoginComponent {
       response => {
         // successfull login
         console.log('Login successful:', response);
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/stations');
       },
       error => {
         // error

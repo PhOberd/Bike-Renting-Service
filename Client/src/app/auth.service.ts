@@ -16,7 +16,6 @@ export class AuthService {
     return this.http.post<any>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         map(response => {
-          // check if there is a token
           if (response && response.token) {
             // store token in localstorage if it is browser (to avoid error)
             if (isPlatformBrowser(this.platformId)) {
@@ -24,9 +23,6 @@ export class AuthService {
             }
           }
           return response;
-        }),
-        catchError(error => {
-          return of(error);
         })
       );
   }
