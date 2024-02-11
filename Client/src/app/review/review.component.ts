@@ -23,7 +23,7 @@ export class ReviewComponent {
   submit(){
     const token = this.authService.getToken();
     if (token) {
-      this.reviewService.postReview(token, 2, this.ticket.model_id, this.ticket.station_id, this.reviewText, this.selectedRating).subscribe(
+      this.reviewService.postReview(token, this.ticket.model_id, this.ticket.station_id, this.reviewText, this.selectedRating).subscribe(
         (response) => {
           this.ticketService.changeTicketStatus(token, this.ticket.ticket_id, "Reviewed").subscribe(
             () => {

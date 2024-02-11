@@ -30,13 +30,12 @@ export class ReviewService {
     );
   }
 
-  postReview(token: string, user_id: number, model_id: number, station_id: number, reviewText: string, rating: number): Observable<any> {
+  postReview(token: string, model_id: number, station_id: number, reviewText: string, rating: number): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
     });
 
     const body = {
-      user_id: user_id,
       model_id: model_id,
       station_id: station_id,
       reviewText: reviewText,

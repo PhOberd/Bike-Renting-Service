@@ -96,7 +96,6 @@ export class RentConfirmationComponent implements OnInit {
     const endTimeISOString = endTime.toISOString();
 
     return {
-      "user_id": 2,
       "model_id": this.selectedBike.model_id,
       "category_id": this.selectedBike.category_id,
       "start_time": startTimeISOString,

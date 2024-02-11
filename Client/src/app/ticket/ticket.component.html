@@ -5,6 +5,7 @@
     <p><strong>Start time:</strong> {{ticket.start_time}}</p>
     <p><strong>End time:</strong> {{ticket.end_time}}</p>
     <p><strong>Ticket status:</strong> {{ticket.status}}</p>
+    <p><strong>Price:</strong> {{ticket.price}}</p>
 
     <div *ngIf="ticket.status === 'Expired'">
         <button type="button" (click)="toggleReview()">Review</button>
@@ -19,7 +20,8 @@
 
     <div *ngIf="ticket.status === 'Inactive'">
         <button type="button" (click)="requestQR()" *ngIf="!qrCodeData">Request QR code</button>
-        <button type="button" (click)="useBike()" *ngIf="qrCodeData">Use bike</button> 
+        <button type="button" (click)="useBike()" *ngIf="qrCodeData">Use bike</button>
+        <button type="button" (click)="returnTicket()" *ngIf="isReturnable">Return ticket</button>  
         <div *ngIf="qrCodeData">
             <img [src]="qrCodeData" alt="QR Code">
         </div>

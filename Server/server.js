@@ -275,13 +275,14 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
 });
 
 app.post('/booking-tickets',checkAuth, async (req, res) => {
-    const data = { category_id, end_time, model_id, price, start_time, status, user_id, station_id } = req.body.ticket;
+    const data = { category_id, end_time, model_id, price, start_time, status, station_id } = req.body.ticket;
+    const userId = req.userData.userId;
     try {
         const result = await pool.query(`
             INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
-            [user_id, model_id, category_id, start_time, end_time, price, status, station_id]);
+            [userId, model_id, category_id, start_time, end_time, price, status, station_id]);
 
         const ticket = result.rows[0];
         res.status(200).json(ticket);
@@ -405,14 +406,15 @@ app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
 });
 
 app.post('/tickets/reviews',checkAuth, async (req, res) => {
-    const data = { user_id, model_id, station_id, reviewText, rating } = req.body;
-    console.log(data.ticket)
+    const data = { model_id, station_id, reviewText, rating } = req.body;
+    const userId = req.userData.userId;
+
     try {
         const result = await pool.query(`
             INSERT INTO reviews (user_id, model_id, station_id, rating, comment)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING *`,
-            [user_id, model_id, station_id, rating, reviewText]);
+            [userId, model_id, station_id, rating, reviewText]);
 
         const review = result.rows[0];
         res.status(200).json(review);
