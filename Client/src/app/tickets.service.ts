@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TicketsService {
-  private ticketsUrl = 'http://localhost:3000/booking-tickets';
+  private baseUrl = 'http://localhost:3000/';
 
   constructor(private http: HttpClient) { }
 
@@ -14,13 +14,20 @@ export class TicketsService {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.get<any>(this.ticketsUrl, { headers });
+    return this.http.get<any>(`${this.baseUrl}booking-tickets`, { headers });
   }
 
   postTicket(token: string, ticket: any): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.post<any>(this.ticketsUrl, { ticket }, { headers });
+    return this.http.post<any>(`${this.baseUrl}booking-tickets`, { ticket }, { headers });
+  }
+
+  changeTicketStatus(token: string, ticketId: any, status: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.patch<any>(`${this.baseUrl}booking-tickets/${ticketId}`, { status }, { headers });
   }
 }

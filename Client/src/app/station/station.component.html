@@ -22,7 +22,7 @@
       (rentLaterRequest)="onRentLaterRequested($event)"></app-bike>
       <app-rent-confirmation *ngIf="isRentConfirmationOpen && bike === selectedBike" 
       [isRentNow]="isRentNow"
-      [selectedBike]="selectedBike"></app-rent-confirmation>
+      [selectedBike]="selectedBike" [stationId]="stationId"></app-rent-confirmation>
   </div>
   </div>
   <div *ngIf="bikes.length === 0">

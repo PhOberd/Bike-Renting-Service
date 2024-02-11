@@ -275,19 +275,44 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
 });
 
 app.post('/booking-tickets',checkAuth, async (req, res) => {
-    const data = { category_id, end_time, model_id, price, start_time, status, user_id } = req.body.ticket;
-    console.log(data.ticket)
+    const data = { category_id, end_time, model_id, price, start_time, status, user_id, station_id } = req.body.ticket;
     try {
         const result = await pool.query(`
-            INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
-            [user_id, model_id, category_id, start_time, end_time, price, status]);
+            [user_id, model_id, category_id, start_time, end_time, price, status, station_id]);
 
         const ticket = result.rows[0];
         res.status(200).json(ticket);
     } catch (error) {
         console.error('Error inserting ticket into database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.patch('/booking-tickets/:ticketId', checkAuth, async (req, res) => {
+    const ticketId = req.params.ticketId;
+    console.log(ticketId)
+    const { status } = req.body;
+    console.log(status);
+
+    try {
+        const result = await pool.query(`
+            UPDATE tickets 
+            SET status = $1
+            WHERE ticket_id = $2
+            RETURNING *`,
+            [status, ticketId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Ticket not found' });
+        }
+
+        const updatedTicket = result.rows[0];
+        res.status(200).json(updatedTicket);
+    } catch (error) {
+        console.error('Error updating ticket status in database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -375,6 +400,24 @@ app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
         res.json(reviews);
     }catch(error){
         console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/tickets/reviews',checkAuth, async (req, res) => {
+    const data = { user_id, model_id, station_id, reviewText, rating } = req.body;
+    console.log(data.ticket)
+    try {
+        const result = await pool.query(`
+            INSERT INTO reviews (user_id, model_id, station_id, rating, comment)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *`,
+            [user_id, model_id, station_id, rating, reviewText]);
+
+        const review = result.rows[0];
+        res.status(200).json(review);
+    } catch (error) {
+        console.error('Error inserting review into database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });

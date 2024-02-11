@@ -1,7 +1,27 @@
 <div class="ticket-container">
     <p><strong>Model id:</strong> {{ticket.model_id}}</p>
     <p><strong>Category id:</strong> {{ticket.category_id}}</p>
+    <p><strong>Station id:</strong> {{ticket.station_id}}</p>
     <p><strong>Start time:</strong> {{ticket.start_time}}</p>
     <p><strong>End time:</strong> {{ticket.end_time}}</p>
     <p><strong>Ticket status:</strong> {{ticket.status}}</p>
+
+    <div *ngIf="ticket.status === 'Expired'">
+        <button type="button" (click)="toggleReview()">Review</button>
+        <div *ngIf="showReview">
+            <app-review [ticket]="ticket" (reviewed)="handleReviewed()"></app-review>
+        </div> 
+    </div>
+    
+    <div *ngIf="ticket.status === 'Active'">
+        <button type="button" (click)="parkBike()">Park bike</button> 
+    </div>    
+
+    <div *ngIf="ticket.status === 'Inactive'">
+        <button type="button" (click)="requestQR()" *ngIf="!qrCodeData">Request QR code</button>
+        <button type="button" (click)="useBike()" *ngIf="qrCodeData">Use bike</button> 
+        <div *ngIf="qrCodeData">
+            <img [src]="qrCodeData" alt="QR Code">
+        </div>
+    </div>
 </div>

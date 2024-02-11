@@ -9,3 +9,16 @@
 .ticket-container h2 {
     text-align: center;
   }
+
+.ticket-container button {
+    display: block;
+    width: 50%;
+    padding: 10px;
+    margin: auto;
+    margin-bottom: 20px;
+    background-color: green;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

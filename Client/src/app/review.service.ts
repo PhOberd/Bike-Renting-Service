@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ReviewService {
-  private baseBikesUrl = 'http://localhost:3000/stations/';
+  private baseUrl = 'http://localhost:3000/';
 
   constructor(private http: HttpClient) { }
 
@@ -15,7 +15,7 @@ export class ReviewService {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.get<any>(`${this.baseBikesUrl}${stationId}/reviews`, { headers }).pipe(
+    return this.http.get<any>(`${this.baseUrl}stations/${stationId}/reviews`, { headers }).pipe(
       map(numbers => {
         let sum = 0;
         if (numbers && numbers.length > 0) {
@@ -28,5 +28,21 @@ export class ReviewService {
         }
       })
     );
+  }
+
+  postReview(token: string, user_id: number, model_id: number, station_id: number, reviewText: string, rating: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    const body = {
+      user_id: user_id,
+      model_id: model_id,
+      station_id: station_id,
+      reviewText: reviewText,
+      rating: rating
+    };
+
+    return this.http.post<any>(`${this.baseUrl}tickets/reviews`, body, { headers });
   }
 }

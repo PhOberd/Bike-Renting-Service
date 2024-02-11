@@ -1,0 +1,20 @@
+<div class="ticket-container">
+<div class="review-input">
+    <label for="review">Review text:</label><br>
+    <textarea id="review" name="review" rows="10" cols="30" maxlength="500" placeholder="Enter your review (max 500 chars)"
+    [(ngModel)]="reviewText"></textarea>
+</div>
+
+<div class="dropdown">
+    <label for="rating">Rating:</label>
+    <select id="rating" name="rating" [(ngModel)]="selectedRating">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+</div>
+
+<button type="button" (click)="submit()">Submit</button>
+</div>

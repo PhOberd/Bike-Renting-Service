@@ -15,6 +15,7 @@ import { TicketsService } from '../tickets.service';
 export class RentConfirmationComponent implements OnInit {
   @Input() selectedBike: any;
   @Input() isRentNow: any;
+  @Input() stationId: any;
   selectedRentHours: number = 1;
   price: number = 0;
   balance: number = 0;
@@ -101,7 +102,8 @@ export class RentConfirmationComponent implements OnInit {
       "start_time": startTimeISOString,
       "end_time": endTimeISOString,
       "price": this.price,
-      "status": "Inactive"
+      "status": "Inactive",
+      "station_id": parseInt(this.stationId)
     };
   }
 
