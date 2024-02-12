@@ -657,7 +657,7 @@ app.put('/booking_tickets/:ticketId',checkAuth, async (req, res) => {
     }
 });
 
-//route deletes an exsiting ticket with given id (admin)
+//route deletes an exsiting ticket with given id 
 app.delete('/booking_tickets/:ticketId', checkAuth, async (req, res) => {
 
     const ticketId = req.params.ticket_id;

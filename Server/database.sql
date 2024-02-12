@@ -5,7 +5,7 @@
 -- Dumped from database version 16.1
 -- Dumped by pg_dump version 16.1
 
--- Started on 2024-02-10 12:47:42
+-- Started on 2024-02-12 23:09:11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -213,7 +213,8 @@ CREATE TABLE public.parking_places (
     place_id integer NOT NULL,
     station_id integer,
     number integer NOT NULL,
-    category_id integer
+    category_id integer,
+    bike_id integer
 );
 
 
@@ -300,6 +301,7 @@ CREATE TABLE public.tickets (
     end_time timestamp without time zone,
     price numeric(8,2),
     status character varying(20),
+    station_id integer,
     CONSTRAINT valid_times CHECK ((end_time > start_time))
 );
 
@@ -447,6 +449,7 @@ COPY public.bike_categories (category_id, name) FROM stdin;
 10	Electric Bikes
 11	Children Bikes
 12	City Bikes
+14	Same Bike
 \.
 
 
@@ -481,8 +484,8 @@ COPY public.bike_stations (station_id, name, address, latitude, longitude) FROM 
 --
 
 COPY public.individual_bikes (bike_id, model_id, unique_id, station_id, status) FROM stdin;
-1	1	MTN001	11	Free
 2	2	EL001	12	Free
+1	1	MTN001	11	Free
 \.
 
 
@@ -492,11 +495,11 @@ COPY public.individual_bikes (bike_id, model_id, unique_id, station_id, status) 
 -- Data for Name: parking_places; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.parking_places (place_id, station_id, number, category_id) FROM stdin;
-17	11	1	9
-18	11	2	10
-19	12	1	11
-20	12	2	12
+COPY public.parking_places (place_id, station_id, number, category_id, bike_id) FROM stdin;
+17	11	1	9	\N
+18	11	2	10	\N
+19	12	1	11	\N
+20	12	2	12	\N
 \.
 
 
@@ -509,6 +512,7 @@ COPY public.parking_places (place_id, station_id, number, category_id) FROM stdi
 COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) FROM stdin;
 1	1	1	11	5	Cool!
 2	2	2	12	4	Jo geht eh!
+3	1	1	11	4	supi dupi!
 \.
 
 
@@ -518,9 +522,9 @@ COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) 
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_time, price, status) FROM stdin;
-1	1	1	9	2024-01-20 10:00:00	2024-01-20 12:00:00	15.00	Active
-2	2	2	10	2024-01-21 15:00:00	2024-01-21 17:00:00	10.00	Active
+COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_time, price, status, station_id) FROM stdin;
+1	1	1	9	2024-01-20 10:00:00	2024-01-20 12:00:00	15.00	Active	11
+2	2	2	10	2024-01-21 15:00:00	2024-01-21 17:00:00	10.00	Active	12
 \.
 
 
@@ -532,8 +536,8 @@ COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_
 
 COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
 2	user2@example.com	password2	100.00	f
-1	user1@example.com	password1	0.00	f
 3	admin	admin	0.00	t
+1	user1@example.com	password1	100.00	f
 \.
 
 
@@ -543,7 +547,7 @@ COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
 -- Name: bike_categories_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 12, true);
+SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 14, true);
 
 
 --
@@ -552,7 +556,7 @@ SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 12, true);
 -- Name: bike_models_model_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bike_models_model_id_seq', 22, true);
+SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
 
 
 --
@@ -570,7 +574,7 @@ SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 16, true);
 -- Name: individual_bikes_bike_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 3, true);
+SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 5, true);
 
 
 --
@@ -588,7 +592,7 @@ SELECT pg_catalog.setval('public.parking_places_place_id_seq', 20, true);
 -- Name: reviews_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reviews_review_id_seq', 1, false);
+SELECT pg_catalog.setval('public.reviews_review_id_seq', 3, true);
 
 
 --
@@ -606,7 +610,7 @@ SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, false);
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 4, true);
 
 
 --
@@ -789,7 +793,7 @@ ALTER TABLE ONLY public.tickets
     ADD CONSTRAINT tickets_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.bike_models(model_id);
 
 
--- Completed on 2024-02-10 12:47:42
+-- Completed on 2024-02-12 23:09:12
 
 --
 -- PostgreSQL database dump complete
