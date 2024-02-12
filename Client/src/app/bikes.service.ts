@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BikesService {
-  private baseBikesUrl = 'http://localhost:3000/stations/';
+  private baseUrl = 'http://localhost:3000/';
 
   constructor(private http: HttpClient) { }
 
@@ -14,6 +14,14 @@ export class BikesService {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.get<any>(`${this.baseBikesUrl}${stationId}/bike`, { headers });
+    return this.http.get<any>(`${this.baseUrl}stations/${stationId}/free-bikes`, { headers });
+  }
+
+  changeBikeStatus(token: string, bikeId: string, status: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.patch<any>(`${this.baseUrl}bikes/${bikeId}/status`, { status }, { headers });
   }
 }

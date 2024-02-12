@@ -150,7 +150,6 @@ app.post('/stations', async (req, res) => {
 });
 
 //routes for the categories
-
 app.get('/categories',checkAuth, async (req, res) => {
 
     try{
@@ -165,7 +164,6 @@ app.get('/categories',checkAuth, async (req, res) => {
 });
 
 //routes for the models
-
 app.get('/models',checkAuth, async (req, res) => {
 
     try{
@@ -180,7 +178,6 @@ app.get('/models',checkAuth, async (req, res) => {
 });
 
 //routes for the bikes
-
 app.get('/bikes',checkAuth, async (req, res) => {
 
     try{
@@ -219,7 +216,7 @@ app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
     }
 });
 
-app.get('/stations/:stationId/bike',checkAuth, async (req, res) => {
+app.get('/stations/:stationId/free-bikes',checkAuth, async (req, res) => {
 
     try {
         const stationId = req.params.stationId;
@@ -231,7 +228,11 @@ app.get('/stations/:stationId/bike',checkAuth, async (req, res) => {
 
         // Query to get bikes assigned to the specific station
         const query = {
-            text: 'SELECT bm.model_id as model_id, bc.category_id as category_id, ib.bike_id as id, bm.name as model_name, bc.name as category_name, bm.wheel_size, bm.manufacturer, bm.brake_type, bm.pph FROM individual_bikes ib, bike_models bm, bike_categories bc WHERE station_id = $1 AND ib.model_id = bm.model_id AND bm.category_id = bc.category_id',
+            text: `SELECT ib.bike_id, bm.model_id as model_id, bc.category_id as category_id, 
+            ib.bike_id as id, bm.name as model_name, bc.name as category_name, bm.wheel_size, 
+            bm.manufacturer, bm.brake_type, bm.price as pph FROM individual_bikes ib, bike_models bm, 
+            bike_categories bc WHERE station_id = $1 AND ib.model_id = bm.model_id AND 
+            bm.category_id = bc.category_id AND ib.status = 'Free'`,
             values: [stationId],
         };
 
@@ -275,14 +276,14 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
 });
 
 app.post('/booking-tickets',checkAuth, async (req, res) => {
-    const data = { category_id, end_time, model_id, price, start_time, status, station_id } = req.body.ticket;
+    const data = { category_id, end_time, model_id, price, start_time, status, station_id, bike_id } = req.body.ticket;
     const userId = req.userData.userId;
     try {
         const result = await pool.query(`
-            INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id, bike_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *`,
-            [userId, model_id, category_id, start_time, end_time, price, status, station_id]);
+            [userId, model_id, category_id, start_time, end_time, price, status, station_id, bike_id]);
 
         const ticket = result.rows[0];
         res.status(200).json(ticket);
@@ -292,11 +293,9 @@ app.post('/booking-tickets',checkAuth, async (req, res) => {
     }
 });
 
-app.patch('/booking-tickets/:ticketId', checkAuth, async (req, res) => {
+app.patch('/booking-tickets/:ticketId/status', checkAuth, async (req, res) => {
     const ticketId = req.params.ticketId;
-    console.log(ticketId)
     const { status } = req.body;
-    console.log(status);
 
     try {
         const result = await pool.query(`
@@ -405,6 +404,7 @@ app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
     }
 });
 
+//post review
 app.post('/tickets/reviews',checkAuth, async (req, res) => {
     const data = { model_id, station_id, reviewText, rating } = req.body;
     const userId = req.userData.userId;
@@ -420,6 +420,104 @@ app.post('/tickets/reviews',checkAuth, async (req, res) => {
         res.status(200).json(review);
     } catch (error) {
         console.error('Error inserting review into database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//change bike status
+app.patch('/bikes/:bikeId/status', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+    const { status } = req.body;
+
+    try {
+        const result = await pool.query(`
+            UPDATE individual_bikes 
+            SET status = $1
+            WHERE bike_id = $2
+            RETURNING *`,
+            [status, bikeId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedBike = result.rows[0];
+        res.status(200).json(updatedBike);
+    } catch (error) {
+        console.error('Error updating ticket status in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//change bikeId to empty in parking places
+app.patch('/parking-places/:bikeId/empty', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+
+    try {
+        const result = await pool.query(`
+            UPDATE parking_places 
+            SET bike_id = null
+            WHERE bike_id = $1
+            RETURNING *`,
+            [bikeId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedParkingPlace = result.rows[0];
+        res.status(200).json(updatedParkingPlace);
+    } catch (error) {
+        console.error('Error updating parking place in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//assign parking_place for bikeId
+app.patch('/parking-places/:bikeId/assign', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+    const {parkingPlace, station_id} = req.body;
+
+    try {
+        const result = await pool.query(`
+            UPDATE parking_places 
+            SET bike_id = $1
+            WHERE station_id = $2
+            AND number = $3
+            RETURNING *`,
+            [bikeId, station_id, parkingPlace]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedParkingPlace = result.rows[0];
+        res.status(200).json(updatedParkingPlace);
+    } catch (error) {
+        console.error('Error updating parking place in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//get free stations and parking_places for categoryId
+app.get('/parking-places/:categoryId/',checkAuth, async (req, res) => {
+
+    try{
+        const categoryId = req.params.categoryId;
+
+        // Validate stationId
+        if (!categoryId || isNaN(categoryId)) {
+            return res.status(400).json({ message: 'Invalid categoryId' });
+        }
+
+        let parking_places = [];
+        const result = await pool.query(`SELECT station_id, number FROM parking_places WHERE category_id = $1 AND bike_id IS NULL`, 
+        [categoryId]);
+
+        parking_places = result.rows;
+        res.json(parking_places);
+    }catch(error){
+        console.error('Error querying database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });

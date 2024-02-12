@@ -28,6 +28,6 @@ export class TicketsService {
     const headers = new HttpHeaders({
       'Authorization': token
     });
-    return this.http.patch<any>(`${this.baseUrl}booking-tickets/${ticketId}`, { status }, { headers });
+    return this.http.patch<any>(`${this.baseUrl}booking-tickets/${ticketId}/status`, { status }, { headers });
   }
 }

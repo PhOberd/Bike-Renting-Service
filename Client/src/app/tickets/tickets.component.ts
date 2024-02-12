@@ -17,22 +17,21 @@ export class TicketsComponent {
   
     constructor(private ticketsService: TicketsService, private authService: AuthService) {}
   
-      ngOnInit() {
-        this.fetchTickets();
-      }
+    async ngOnInit() {
+      await this.fetchTickets();
+     }
   
-    fetchTickets() {
+  async fetchTickets() {
       const token = this.authService.getToken();
       if (token) {
-        this.ticketsService.getTickets(token).subscribe(
-          (tickets) => {
-            this.tickets = tickets
-            console.log(this.tickets)
-        },
-          (error) => {
-            console.error('Error fetching tickets:', error);
+          try {
+              const tickets = await this.ticketsService.getTickets(token).toPromise();
+              //sort tickets, so most recent ticket is on top!
+              this.tickets = tickets.sort((a: any, b: any) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+              console.log(this.tickets);
+          } catch (error) {
+              console.error('Error fetching tickets:', error);
           }
-        );
-        }
-    }
+      }
+  }
   }

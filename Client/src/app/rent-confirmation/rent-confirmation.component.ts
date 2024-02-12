@@ -102,7 +102,8 @@ export class RentConfirmationComponent implements OnInit {
       "end_time": endTimeISOString,
       "price": this.price,
       "status": "Inactive",
-      "station_id": parseInt(this.stationId)
+      "station_id": parseInt(this.stationId),
+      "bike_id": this.selectedBike.bike_id
     };
   }
 
