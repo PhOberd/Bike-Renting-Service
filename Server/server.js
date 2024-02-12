@@ -755,7 +755,7 @@ app.get('/users/:userId',checkAuth, async (req, res) => {
 });
 
 //creating a new user
-app.post('/users', checkAuth, async (req, res) => {
+app.post('/users', async (req, res) => {
     try {
         const {email, password} = req.body;
 
@@ -804,7 +804,7 @@ app.put('/user/:userId',checkAuth, async (req, res) => {
         // Update the user
         const updateQuery = {
             text: 'UPDATE users SET email = $1, password = $2, wallet = $3, isAdmin = $4 WHERE user_id = $5',
-            values: [email, password, wallet, isAdmin]
+            values: [email, password, wallet, isAdmin, userId]
         };
         await pool.query(updateQuery);
 
@@ -815,13 +815,13 @@ app.put('/user/:userId',checkAuth, async (req, res) => {
     }
 });
 
-//route deletes an exsiting user with given id (admin)
+//route deletes an exsiting user with given id
 app.delete('/users/:userId', checkAuth, async (req, res) => {
 
     const userId = req.params.userId;
     const userIdReal = req.userData.userId;
 
-    if(userId != userIdReal){
+    if(userId != userIdReal || !req.userData.isAdmin){
         return res.status(403).json({ message: 'Forbidden' });
     }
 
@@ -883,17 +883,21 @@ app.post('/users/:userId/wallet',checkAuth, async (req, res) => {
 
     const new_balance = req.body.balance;
 
+    if(!new_balance){
+        return res.status(400).json({ message: 'Invalid input data' });
+    }
+
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT wallet FROM users WHERE user_id = $1', [userId]);
-        const wallet = result.rows[0];
+        const wallet = parseFloat(result.rows[0].wallet);
 
-        wallet = wallet + new_balance;
+        const new_wallet = wallet + new_balance;
 
         // Update the wallet
         const updateQuery = {
             text: 'UPDATE users SET wallet = $1 WHERE user_id = $2',
-            values: [wallet, userId]
+            values: [new_wallet, userId]
         };
         await pool.query(updateQuery);
         
@@ -913,17 +917,22 @@ app.delete('/users/:userId/wallet',checkAuth, async (req, res) => {
 
     const new_balance = req.body.balance;
 
+    if(!new_balance){
+        return res.status(400).json({ message: 'Invalid input data' });
+    }
+
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT wallet FROM users WHERE user_id = $1', [userId]);
-        const wallet = result.rows[0];
+        const wallet = parseFloat(result.rows[0].wallet);
 
-        wallet = wallet - new_balance;
+        const new_wallet = wallet - new_balance;
+        console.log(new_wallet);
 
         // Update the wallet
         const updateQuery = {
             text: 'UPDATE users SET wallet = $1 WHERE user_id = $2',
-            values: [wallet, userId]
+            values: [new_wallet, userId]
         };
         await pool.query(updateQuery);
         
@@ -938,13 +947,13 @@ app.delete('/users/:userId/wallet',checkAuth, async (req, res) => {
 //routes for managing reviews
 
 //route for returning reviews for a specific station
-app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
+app.get('/stations/s:stationId/reviews',checkAuth, async (req, res) => {
     const stationId = req.params.stationId;
 
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM reviews WHERE station_id = $1', [stationId]);
-        const reviews = result.rows[0];
+        const reviews = result.rows;
 
         if (!reviews) {
             res.status(404).json({ message: 'No reviews' });
@@ -959,7 +968,7 @@ app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for returning reviews for a specific model
-app.get('/stations/:modelId/reviews',checkAuth, async (req, res) => {
+app.get('/stations/m:modelId/reviews',checkAuth, async (req, res) => {
     const modelId = req.params.modelId;
 
     try {
@@ -983,26 +992,35 @@ app.get('/stations/:modelId/reviews',checkAuth, async (req, res) => {
 
 app.post("/booking-tickets/:ticketId/reviews", checkAuth, async(req, res) => {
 
+    const { rating, comment } = req.body;
     const ticketId = req.params.ticketId;
-    const {user_id, model_id, station_id, rating, comment } = req.body;
+    if (!rating || !comment) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
 
     try {
-        // Validate input data
-        if (!user_id || !model_id || !station_id || !rating || !comment) {
-            return res.status(400).json({ message: 'Invalid input data' });
+        // Fetch ticket information based on ticketId
+        const ticketQuery = {
+            text: 'SELECT model_id, station_id, user_id FROM tickets WHERE ticket_id = $1',
+            values: [ticketId]
+        };
+        const ticketResult = await pool.query(ticketQuery);
+        const { model_id, station_id, user_id } = ticketResult.rows[0];
+
+        if(user_id != req.userData.userId){
+            return res.status(403).json({message: "cant review other tickets than your own"});
         }
 
-        // Insert new review into the database
-        const query = {
-            text: 'INSERT INTO reviews (user_id, model_id, station_id, rating, comment) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            values: [user_id, model_id, station_id, rating, comment],
+        // Insert review into the database
+        const insertQuery = {
+            text: 'INSERT INTO reviews (rating, comment, model_id, station_id, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            values: [rating, comment, model_id, station_id, user_id]
         };
+        const result = await pool.query(insertQuery);
 
-        const result = await pool.query(query);
-
-        res.status(201).json({ message: 'review created successfully'});
+        res.status(201).json({ message: 'Review added successfully', review: result.rows[0] });
     } catch (error) {
-        console.error('Error creating review:', error);
+        console.error('Error adding review:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
