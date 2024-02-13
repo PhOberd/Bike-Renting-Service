@@ -591,6 +591,7 @@ app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
     }
 });
 
+//get all free bikes
 app.get('/stations/:stationId/free-bikes',checkAuth, async (req, res) => {
 
     try {
@@ -710,17 +711,20 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
 //creating a new ticket
 app.post('/booking-tickets', checkAuth, async (req, res) => {
     try {
-        const {user_id, model_id, category_id, start_time, end_time, price, status} = req.body;
+        const data = { category_id, end_time, model_id, price, start_time, status, station_id, bike_id } = req.body.ticket;
+        const userId = req.userData.userId;
 
         // Validate input data
-        if (!user_id|| !model_id|| !category_id|| !start_time|| !end_time|| !price|| !status) {
+        if (!userId|| !model_id|| !category_id|| !start_time|| !end_time|| !price|| !status) {
             return res.status(400).json({ message: 'Invalid input data' });
         }
 
         // Insert new ticket into the database
         const query = {
-            text: 'INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            values: [user_id, model_id, category_id, start_time, end_time, price, status],
+            text: `INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id, bike_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *`,
+            values: [userId, model_id, category_id, start_time, end_time, price, status, station_id, bike_id],
         };
 
         const result = await pool.query(query);
@@ -795,6 +799,7 @@ app.delete('/booking_tickets/:ticketId', checkAuth, async (req, res) => {
     }
 });
 
+//change ticket status
 app.patch('/booking-tickets/:ticketId/status', checkAuth, async (req, res) => {
     const ticketId = req.params.ticketId;
     const { status } = req.body;
@@ -1078,7 +1083,7 @@ app.delete('/users/:userId/wallet',checkAuth, async (req, res) => {
 //routes for managing reviews
 
 //route for returning reviews for a specific station
-app.get('/stations/s:stationId/reviews',checkAuth, async (req, res) => {
+app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
     const stationId = req.params.stationId;
 
     try {
@@ -1099,7 +1104,7 @@ app.get('/stations/s:stationId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for returning reviews for a specific model
-app.get('/stations/m:modelId/reviews',checkAuth, async (req, res) => {
+app.get('/stations/:modelId/reviews',checkAuth, async (req, res) => {
     const modelId = req.params.modelId;
 
     try {
@@ -1120,7 +1125,6 @@ app.get('/stations/m:modelId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for writing  reviews
-
 app.post("/booking-tickets/:ticketId/reviews", checkAuth, async(req, res) => {
 
     const { rating, comment } = req.body;
@@ -1152,28 +1156,6 @@ app.post("/booking-tickets/:ticketId/reviews", checkAuth, async(req, res) => {
         res.status(201).json({ message: 'Review added successfully', review: result.rows[0] });
     } catch (error) {
         console.error('Error adding review:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
-
-//reviews from specific station
-app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
-
-    try{
-        const stationId = req.params.stationId;
-
-        // Validate stationId
-        if (!stationId || isNaN(stationId)) {
-            return res.status(400).json({ message: 'Invalid stationId' });
-        }
-
-        let reviews = [];
-        const result = await pool.query('SELECT rating FROM reviews WHERE station_id = $1', [stationId]);
-        reviews = result.rows;
-        res.json(reviews);
-    }catch(error){
-        console.error('Error querying database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
