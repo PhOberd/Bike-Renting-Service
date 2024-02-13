@@ -81,6 +81,8 @@ CREATE TABLE public.bike_models (
     manufacturer character varying(255),
     brake_type character varying(255),
     price numeric(6,2)
+    brake_type character varying(255),
+    price numeric(6,2)
 );
 
 
@@ -191,6 +193,8 @@ CREATE TABLE public.parking_places (
     place_id integer NOT NULL,
     station_id integer,
     number integer NOT NULL,
+    category_id integer,
+    bike_id integer
     category_id integer,
     bike_id integer
 );
@@ -404,6 +408,7 @@ COPY public.bike_categories (category_id, name) FROM stdin;
 11	Children Bikes
 12	City Bikes
 14	Same Bike
+14	Same Bike
 \.
 
 
@@ -512,6 +517,7 @@ COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) 
 1	1	1	11	5	Cool!
 2	2	2	12	4	Jo geht eh!
 3	1	1	11	4	supi dupi!
+3	1	1	11	4	supi dupi!
 \.
 
 
@@ -540,12 +546,14 @@ COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
 --
 
 SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 14, true);
+SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 14, true);
 
 
 --
 -- Name: bike_models_model_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
+SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
 SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
 
 
@@ -554,12 +562,14 @@ SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
 --
 
 SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 16, true);
+SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 16, true);
 
 
 --
 -- Name: individual_bikes_bike_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
+SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 5, true);
 SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 5, true);
 
 
@@ -575,6 +585,7 @@ SELECT pg_catalog.setval('public.parking_places_place_id_seq', 20, true);
 --
 
 SELECT pg_catalog.setval('public.reviews_review_id_seq', 3, true);
+SELECT pg_catalog.setval('public.reviews_review_id_seq', 3, true);
 
 
 --
@@ -588,6 +599,7 @@ SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, true);
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
+SELECT pg_catalog.setval('public.users_user_id_seq', 4, true);
 SELECT pg_catalog.setval('public.users_user_id_seq', 4, true);
 
 
