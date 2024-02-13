@@ -48,7 +48,7 @@ export class WalletComponent implements OnInit {
     const token = this.authService.getToken();
     if (token) {
       const amount = parseFloat(amountString);
-      if(amount > 0) {
+      if(amount > 0 && creditCard) {
       this.walletService.chargeBalance(token, amount).subscribe(
         (response: any) => {
           if (response && response.success) {

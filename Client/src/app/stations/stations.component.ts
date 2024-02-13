@@ -32,7 +32,7 @@ export class StationsComponent implements OnInit {
   }
 
   initMap() {
-    this.map = (window as any).L.map('map').setView([46.37100, 14.181700], 10);
+    this.map = (window as any).L.map('map').setView([46.616700, 14.311817], 13);
 
     (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
