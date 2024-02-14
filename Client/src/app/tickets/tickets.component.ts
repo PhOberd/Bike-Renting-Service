@@ -28,7 +28,6 @@ export class TicketsComponent {
               const tickets = await this.ticketsService.getTickets(token).toPromise();
               //sort tickets, so most recent ticket is on top!
               this.tickets = tickets.sort((a: any, b: any) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
-              console.log(this.tickets);
           } catch (error) {
               console.error('Error fetching tickets:', error);
           }

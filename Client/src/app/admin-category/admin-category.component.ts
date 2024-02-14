@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { CategoryService } from '../category.service';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class AdminCategoryComponent {
   @Input() category: any
   message = "";
+  @Output() fetchRequest = new EventEmitter<any>();
   
   constructor(private authService: AuthService,
     private categoryService: CategoryService){}
@@ -22,16 +23,14 @@ export class AdminCategoryComponent {
       if (token) {
         this.categoryService.deleteCategory(token, categoryId).subscribe(
           (response) => {
-            this.message = "Deleted category succesfully!";
-            console.log(response);
+            this.fetchRequest.emit();
           },
           (error) => {
             this.message = error.error.message;
-            console.error('Error deleting category:', error);
           }
         );
         } else {
-          console.error('Authentication not found');
+          this.message = 'Authentication not found'
       }
   }
 }

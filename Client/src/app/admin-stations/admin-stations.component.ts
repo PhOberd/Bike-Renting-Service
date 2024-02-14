@@ -39,7 +39,6 @@ export class AdminStationsComponent implements OnInit {
       this.mapService.getStations(token).subscribe(
         (stations) => {
           this.stations = stations;
-          console.log(this.stations);
         },
         (error) => {
           console.error('Error fetching stations:', error);
@@ -57,23 +56,24 @@ export class AdminStationsComponent implements OnInit {
         this.stationsservice.postStation(token, this.stationForm.value).subscribe(
           (response: any) => {
             this.message = "Station succesfully created!";
-            console.log('Form data posted successfully:', response);
             this.stationForm.reset();
             this.fetchStations();
           },
           (error: any) => {
             this.message = `Error posting category: ${error.error.message}`
-            console.error('Error posting model:', error.error.message);
           }
         )
       }
     } else {
       this.message = "Invalid data! For longitude and latitude please use format number.number!";
-      console.error('Invalid data! For longitude and latitude please use format number.number!');
     }
   }
 
   onStationClick(stationId: number) {
     this.router.navigateByUrl(`/admin/stations/${stationId}`);
+  }
+
+  onFetchRequested() {
+    this.fetchStations();
   }
 }

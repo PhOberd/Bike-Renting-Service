@@ -36,7 +36,6 @@ export class WalletComponent implements OnInit {
         },
         (error) => {
           this.errorMessage = 'Failed to fetch balance.';
-          console.error(error);
         }
       );
     } else {
@@ -59,7 +58,6 @@ export class WalletComponent implements OnInit {
         },
         (error) => {
           this.errorMessage = 'Failed to charge balance.';
-          console.error(error);
         }
       );
       } else {

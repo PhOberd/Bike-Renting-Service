@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { BikesService } from '../bikes.service';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class AdminIndividualBikeComponent {
   @Input() bike: any;
   message = "";
+  @Output() fetchRequest = new EventEmitter<any>();
   
   constructor(private authService: AuthService,
     private bikesService: BikesService){}
@@ -22,16 +23,14 @@ export class AdminIndividualBikeComponent {
       if (token) {
         this.bikesService.deleteBike(token, bikeId).subscribe(
           (response) => {
-            this.message = "Deleted bike succesfully!";
-            console.log(response);
+            this.fetchRequest.emit();
           },
           (error) => {
             this.message = error.error.message;
-            console.error('Error deleting bike:', error);
           }
         );
         } else {
-          console.error('Authentication not found');
+          this.message = 'Authentication not found'
       }
   }
 }

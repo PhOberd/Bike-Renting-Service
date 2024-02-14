@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
 import { StationsService } from '../stations.service';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class AdminStationComponent {
   @Input() station: any
   message = "";
+  @Output() fetchRequest = new EventEmitter<any>();
   
   constructor(private authService: AuthService,
     private stationsService: StationsService){}
@@ -22,16 +23,14 @@ export class AdminStationComponent {
       if (token) {
         this.stationsService.deleteStation(token, stationId).subscribe(
           (response) => {
-            this.message = "Deleted station succesfully!";
-            console.log(response);
+            this.fetchRequest.emit();
           },
           (error) => {
             this.message = error.error.message;
-            console.error('Error deleting station:', error);
           }
         );
         } else {
-          console.error('Authentication not found');
+          this.message = 'Authentication not found'
       }
   }
 }

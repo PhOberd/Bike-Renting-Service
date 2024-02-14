@@ -42,10 +42,8 @@ export class RentConfirmationComponent implements OnInit {
       if (token) {
         this.ticketsService.postTicket(token, ticket).subscribe(
           response => {
-            console.log(response);
             this.walletService.useBalance(token, this.price).subscribe(
               response => {
-                console.log(response);
                 this.errorMessage = ""
                 this.successMessage = "Successfully booked!";
               },
@@ -76,7 +74,6 @@ export class RentConfirmationComponent implements OnInit {
             }
         } catch (error) {
             this.errorMessage = 'Failed to fetch balance.';
-            console.error(error);
         }
     } else {
         this.errorMessage = 'Authentication token not found.';

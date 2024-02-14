@@ -22,12 +22,10 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe(
       response => {
         // successfull login
-        console.log('Login successful:', response);
         this.router.navigateByUrl('/stations');
       },
       error => {
         // error
-        console.error('Login error:', error);
         this.errorMessage = 'Invalid email or password. Please try again.';
       }
     );

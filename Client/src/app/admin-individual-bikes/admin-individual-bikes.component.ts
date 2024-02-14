@@ -46,7 +46,6 @@ export class AdminIndividualBikesComponent implements OnInit {
       this.mapService.getStations(token).subscribe(
         (stations) => {
           this.stations = stations;
-          console.log(this.stations);
         },
         (error) => {
           console.error('Error fetching stations:', error);
@@ -63,7 +62,6 @@ export class AdminIndividualBikesComponent implements OnInit {
       this.bikesService.getBikes(token).subscribe(
         (bikes) => {
           this.bikes = bikes;
-          console.log(this.bikes);
         },
         (error) => {
           console.error('Error fetching bikes:', error);
@@ -80,7 +78,6 @@ export class AdminIndividualBikesComponent implements OnInit {
       this.modelService.getModels(token).subscribe(
         (models) => {
           this.models = models;
-          console.log(this.models);
         },
         (error) => {
           console.error('Error fetching models:', error);
@@ -98,23 +95,24 @@ export class AdminIndividualBikesComponent implements OnInit {
         this.bikesService.postBike(token, this.bikeForm.value).subscribe(
           (response: any) => {
             this.message = "Bike succesfully created!";
-            console.log('Form data posted successfully:', response);
             this.bikeForm.reset();
             this.fetchBikes();
           },
           (error: any) => {
             this.message = `Error creating bike: ${error.error.message}`
-            console.error('Error creating bike:', error.error.message);
           }
         )
       }
     } else {
       this.message = "Invalid data!";
-      console.error('Invalid data!');
     }
   }
 
   onBikeClick(bikeId: number) {
     this.router.navigateByUrl(`/admin/bikes/${bikeId}`);
+    }
+
+    onFetchRequested() {
+      this.fetchBikes();
     }
 }

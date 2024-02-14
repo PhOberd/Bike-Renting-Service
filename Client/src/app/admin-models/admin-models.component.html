@@ -1,5 +1,5 @@
 <div *ngFor="let model of models" (click)="onModelClick(model.model_id)">
-    <app-admin-model [model]="model"></app-admin-model>
+    <app-admin-model [model]="model" (fetchRequest)="onFetchRequested()"></app-admin-model>
 </div>
 
 <div class="create-model-container">

@@ -35,7 +35,6 @@ export class AdminCategoriesComponent implements OnInit{
       this.categoryService.getCategories(token).subscribe(
         (categories) => {
           this.categories = categories;
-          console.log(this.categories);
         },
         (error) => {
           console.error('Error fetching categories:', error);
@@ -53,23 +52,24 @@ export class AdminCategoriesComponent implements OnInit{
         this.categoryService.postCategory(token, this.categoryForm.value).subscribe(
           (response: any) => {
             this.message = "Category succesfully created!";
-            console.log('Form data posted successfully:', response);
             this.categoryForm.reset();
             this.fetchCategories();
           },
           (error: any) => {
             this.message = `Error posting category: ${error.error.message}`
-            console.error('Error posting category:', error.error.message);
           }
         )
       }
     } else {
       this.message = "Invalid data!";
-      console.error('Invalid data!');
     }
   }
 
   onCategoryClick(categoryId: number) {
   this.router.navigateByUrl(`/admin/categories/${categoryId}`);
+  }
+
+  onFetchRequested() {
+    this.fetchCategories();
   }
 }

@@ -79,9 +79,9 @@ export class TicketComponent implements OnInit {
   requestQR(){
     const ticketData = "Ticket for model " + this.ticket.model_id + ", endTime is" + this.ticket.end_time;
   
-    QRCode.toDataURL(ticketData, (err, url) => {
-      if (err) {
-        console.error('Error generating QR code:', err);
+    QRCode.toDataURL(ticketData, (error, url) => {
+      if (error) {
+        this.errorMessage = `Error generating QR code: ${error}`
         return;
       }
       this.qrCodeData = url;
@@ -144,7 +144,6 @@ export class TicketComponent implements OnInit {
           this.ticket.status = "Returned"
           this.walletService.chargeBalance(token, this.ticket.price).subscribe(
             (response) => {
-              console.log(response);
               this.addSuccessMessage("Succesfully returned the bike!")
             }
           );

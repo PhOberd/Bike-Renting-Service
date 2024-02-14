@@ -45,7 +45,6 @@ export class AdminModelsComponent implements OnInit {
       this.categoryService.getCategories(token).subscribe(
         (categories) => {
           this.categories = categories;
-          console.log(this.categories);
         },
         (error) => {
           console.error('Error fetching categories:', error);
@@ -62,7 +61,6 @@ export class AdminModelsComponent implements OnInit {
       this.modelService.getModels(token).subscribe(
         (models) => {
           this.models = models;
-          console.log(this.models);
         },
         (error) => {
           console.error('Error fetching models:', error);
@@ -80,23 +78,24 @@ export class AdminModelsComponent implements OnInit {
         this.modelService.postModels(token, this.modelForm.value).subscribe(
           (response: any) => {
             this.message = "Model succesfully created!";
-            console.log('Form data posted successfully:', response);
             this.modelForm.reset();
             this.fetchModels();
           },
           (error: any) => {
             this.message = `Error posting category: ${error.error.message}`
-            console.error('Error posting model:', error.error.message);
           }
         )
       }
     } else {
       this.message = "Invalid data!";
-      console.error('Invalid data!');
     }
   }
 
   onModelClick(modelId: number) {
     this.router.navigateByUrl(`/admin/models/${modelId}`);
     }
+
+  onFetchRequested() {
+    this.fetchModels();
+  }
 }

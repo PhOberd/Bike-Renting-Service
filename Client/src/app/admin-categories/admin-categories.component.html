@@ -1,5 +1,5 @@
 <div *ngFor="let category of categories" (click)="onCategoryClick(category.category_id)">
-    <app-admin-category [category]="category"></app-admin-category>
+    <app-admin-category [category]="category" (fetchRequest)="onFetchRequested()"></app-admin-category>
 </div>
 
 <div class="create-category-container">

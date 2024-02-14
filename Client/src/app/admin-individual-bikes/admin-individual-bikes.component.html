@@ -1,5 +1,5 @@
 <div *ngFor="let bike of bikes" (click)="onBikeClick(bike.bike_id)">
-    <app-admin-individual-bike [bike]="bike"></app-admin-individual-bike>
+    <app-admin-individual-bike [bike]="bike" (fetchRequest)="onFetchRequested()"></app-admin-individual-bike>
 </div>
 
 <div class="create-bike-container">

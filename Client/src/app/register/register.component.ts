@@ -22,12 +22,10 @@ export class RegisterComponent {
     this.registerService.register(this.email, this.password).subscribe(
       response => {
         // successful register
-        console.log('Register successful:', response);
         this.successMessage = 'Registration successful';
       },
       error => {
         // error
-        console.error('Register error:', error);
         this.errorMessage = 'Registration failed. Please try again.';
       }
     );

@@ -1,5 +1,5 @@
 <div *ngFor="let station of stations" (click)="onStationClick(station.station_id)">
-<app-admin-station [station]="station"></app-admin-station>
+<app-admin-station [station]="station" (fetchRequest)="onFetchRequested()"></app-admin-station>
 </div>
 
 <div class="create-station-container">
