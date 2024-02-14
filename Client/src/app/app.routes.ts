@@ -13,6 +13,8 @@ import { AdminCategoryDetailsComponent } from './admin-category-details/admin-ca
 import { AdminModelDetailsComponent } from './admin-model-details/admin-model-details.component';
 import { AdminIndividualBikesComponent } from './admin-individual-bikes/admin-individual-bikes.component';
 import { AdminIndividualBikeDetailsComponent } from './admin-individual-bike-details/admin-individual-bike-details.component';
+import { AccessDeniedComponent } from './access-denied/access-denied.component';
+import { AdminGuard } from './AdminGuard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -21,12 +23,13 @@ export const routes: Routes = [
     { path: 'stations', component: StationsComponent },
     { path: 'tickets', component: TicketsComponent },
     { path: 'stations/:Id', component: StationComponent },
-    { path: 'admin/stations', component: AdminStationsComponent },
-    { path: 'admin/stations/:Id', component: AdminStationDetailsComponent },
-    { path: 'admin/categories', component: AdminCategoriesComponent },
-    { path: 'admin/categories/:Id', component: AdminCategoryDetailsComponent },
-    { path: 'admin/models', component: AdminModelsComponent },
-    { path: 'admin/models/:Id', component: AdminModelDetailsComponent },
-    { path: 'admin/bikes', component: AdminIndividualBikesComponent },
-    { path: 'admin/bikes/:Id', component: AdminIndividualBikeDetailsComponent }
+    { path: 'admin/stations', component: AdminStationsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/stations/:Id', component: AdminStationDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/categories', component: AdminCategoriesComponent, canActivate: [AdminGuard] },
+    { path: 'admin/categories/:Id', component: AdminCategoryDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/models', component: AdminModelsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/models/:Id', component: AdminModelDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/bikes', component: AdminIndividualBikesComponent, canActivate: [AdminGuard] },
+    { path: 'admin/bikes/:Id', component: AdminIndividualBikeDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'access-denied', component: AccessDeniedComponent }
 ];
