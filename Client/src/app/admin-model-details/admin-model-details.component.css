@@ -1,0 +1,33 @@
+.change-model-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+  }
+
+.change-model-container h2 {
+    text-align: center;
+  }
+
+.change-model-container input[type="text"],
+.change-model-container input[type="number"],
+.change-model-container select {
+    display: block;
+    width: calc(100% - 20px); /* 100% minus padding(left & right) */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #AAAAAA;
+    border-radius: 5px;
+  }
+
+.change-model-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }

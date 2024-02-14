@@ -1,0 +1,44 @@
+button {
+    display: block;
+    width: 20%;
+    padding: 10px;
+    margin: auto;
+    margin-bottom: 20px;
+    background-color: green;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.create-station-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+  }
+
+.create-station-container h2 {
+    text-align: center;
+  }
+
+.create-station-container input[type="text"] {
+    display: block;
+    width: calc(100% - 20px); /* 100% minus padding(left & right) */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #AAAAAA;
+    border-radius: 5px;
+  }
+
+.create-station-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }

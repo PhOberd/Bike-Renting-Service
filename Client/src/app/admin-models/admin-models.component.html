@@ -1,0 +1,46 @@
+<div *ngFor="let model of models" (click)="onModelClick(model.model_id)">
+    <app-admin-model [model]="model"></app-admin-model>
+</div>
+
+<div class="create-model-container">
+    <form [formGroup]="modelForm" (ngSubmit)="onSubmit()">
+        <div>
+          <label>Name:</label>
+          <input type="text" formControlName="name">
+        </div>
+
+        <div>
+            <label>Category:</label>
+            <select formControlName="category_id">
+                <option *ngFor="let category of categories" [value]="category.category_id">{{ category.category_id }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Description:</label>
+            <input type="text" formControlName="description">
+        </div>
+        <div>
+            <label>Wheel Size:</label>
+            <input type="number" formControlName="wheel_size">
+        </div>
+        <div>
+            <label>Manufacturer:</label>
+            <input type="text" formControlName="manufacturer">
+        </div>
+        <div>
+            <label>Brake type:</label>
+            <input type="text" formControlName="brake_type">
+        </div>
+        <div>
+            <label>Price per hour:</label>
+            <input type="number" formControlName="price">
+        </div>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+      </div>
+</div>

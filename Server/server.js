@@ -127,6 +127,32 @@ app.get('/stations',checkAuth, async (req, res) => {
     }
 });
 
+app.get('/stations/:stationId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const stationId = req.params.stationId;
+        const stationQuery = {
+            text: 'SELECT * FROM bike_stations WHERE station_id = $1',
+            values: [stationId]
+        };
+
+        const result = await pool.query(stationQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Station not found' });
+        }
+
+        const station = result.rows[0];
+        res.json(station);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 //route creates a new station in the database (admin)
 app.post('/stations', checkAuth, async (req, res) => {
     if(!req.userData.isAdmin){
@@ -138,6 +164,15 @@ app.post('/stations', checkAuth, async (req, res) => {
         // Validate input data
         if (!name || !address || !latitude || !longitude) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        const testQuery = {
+            text: 'SELECT * FROM bike_stations WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(409).json({ message: 'Station name already exists' });
         }
 
         // Insert new station into the database
@@ -228,6 +263,33 @@ app.put('/stations/:stationId',checkAuth, async (req, res) => {
 
 //routes for the categories---------------------------------------------------------------------------------------------------------------------------
 
+//returning specific category by id
+app.get('/categories/:categoryId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const categoryId = req.params.categoryId;
+        const categoryQuery = {
+            text: 'SELECT * FROM bike_categories WHERE category_id = $1',
+            values: [categoryId]
+        };
+
+        const result = await pool.query(categoryQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        const category = result.rows[0];
+        res.json(category);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 //returning a list with all categories
 app.get('/categories',checkAuth, async (req, res) => {
 
@@ -253,6 +315,16 @@ app.post('/categories', checkAuth, async (req, res) => {
         // Validate input data
         if (!name ) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        
+        const testQuery = {
+            text: 'SELECT * FROM bike_categories WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(409).json({ message: 'Category name already exists' });
         }
 
         // Insert new category into the database
@@ -341,7 +413,6 @@ app.delete('/categories/:categoryId', checkAuth, async (req, res) => {
 });
 
 //routes for the models-----------------------------------------------------------------------------------------------------------------------------
-
 app.get('/models',checkAuth, async (req, res) => {
 
     try{
@@ -349,6 +420,33 @@ app.get('/models',checkAuth, async (req, res) => {
         const result = await pool.query(`SELECT * FROM bike_models`);
         models = result.rows;
         res.json(models);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//returning specific category by id
+app.get('/models/:modelId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const modelId = req.params.modelId;
+        const modelQuery = {
+            text: 'SELECT * FROM bike_models WHERE model_id = $1',
+            values: [modelId]
+        };
+
+        const result = await pool.query(modelQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Model not found' });
+        }
+
+        const model = result.rows[0];
+        res.json(model);
     }catch(error){
         console.error('Error querying database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -366,6 +464,15 @@ app.post('/models', checkAuth, async (req, res) => {
         // Validate input data
         if (!name || !category_id || !description || !wheel_size || !manufacturer || !brake_type || !price) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        const testQuery = {
+            text: 'SELECT * FROM bike_models WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(405).json({ message: 'Model name already exists' });
         }
 
         // Insert new model into the database
@@ -1104,13 +1211,13 @@ app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for returning reviews for a specific model
-app.get('/stations/:modelId/reviews',checkAuth, async (req, res) => {
+app.get('/models/:modelId/reviews',checkAuth, async (req, res) => {
     const modelId = req.params.modelId;
 
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM reviews WHERE model_id = $1', [modelId]);
-        const reviews = result.rows[0];
+        const reviews = result.rows;
 
         if (!reviews) {
             res.status(404).json({ message: 'No reviews' });
@@ -1256,7 +1363,7 @@ app.patch('/parking-places/:bikeId/assign', checkAuth, async (req, res) => {
 });
 
 //get free stations and parking_places for categoryId
-app.get('/parking-places/:categoryId/',checkAuth, async (req, res) => {
+app.get('/parking-places/:categoryId/free',checkAuth, async (req, res) => {
 
     try{
         const categoryId = req.params.categoryId;
@@ -1277,7 +1384,7 @@ app.get('/parking-places/:categoryId/',checkAuth, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-  
+
 let port = 3000;
 app.listen(port);
 console.log("Server running at: http://localhost:"+port);

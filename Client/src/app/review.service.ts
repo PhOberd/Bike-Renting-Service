@@ -30,6 +30,25 @@ export class ReviewService {
     );
   }
 
+  getRatioByModelId(token: string, modelId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.get<any>(`${this.baseUrl}models/${modelId}/reviews`, { headers }).pipe(
+      map(numbers => {
+        let sum = 0;
+        if (numbers && numbers.length > 0) {
+          for (let i = 0; i < numbers.length; i++) {
+            sum += numbers[i].rating;
+          }
+          return Math.round(sum / numbers.length);
+        } else {
+          return 0;
+        }
+      })
+    );
+  }
+
   postReview(token: string, model_id: number, station_id: number, reviewText: string, rating: number): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
@@ -43,5 +62,21 @@ export class ReviewService {
     };
 
     return this.http.post<any>(`${this.baseUrl}tickets/reviews`, body, { headers });
+  }
+
+  getReviewsByStationID(token: string, stationId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.get<any>(`${this.baseUrl}stations/${stationId}/reviews`, { headers });
+  }
+
+  getReviewsByModelId(token: string, modelId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.get<any>(`${this.baseUrl}models/${modelId}/reviews`, { headers });
   }
 }

@@ -15,7 +15,7 @@ export class ParkingPlaceService {
       'Authorization': token
     });
 
-    return this.http.get<any>(`${this.baseUrl}/${categoryId}/`, { headers });
+    return this.http.get<any>(`${this.baseUrl}/${categoryId}/free`, { headers });
   }
 
   emptyParkingPlaceByBikeId(token: string, bike_id: number): Observable<any> {

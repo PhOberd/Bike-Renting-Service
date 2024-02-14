@@ -1,0 +1,63 @@
+<p><strong>Id:</strong> {{modelDetails?.category_id}}</p>
+<p><strong>Name:</strong> {{modelDetails?.name}}</p>
+<p><strong>Category Id:</strong> {{modelDetails?.category_id}}</p>
+<p><strong>Description:</strong> {{modelDetails?.description}}</p>
+<p><strong>Wheel Size:</strong> {{modelDetails?.wheel_size}}</p>
+<p><strong>Manufacturer:</strong> {{modelDetails?.manufacturer}}</p>
+<p><strong>Brake Type:</strong> {{modelDetails?.brake_type}}</p>
+<p><strong>Price per hour:</strong> {{modelDetails?.price}}</p>
+
+<div class="rating-container">
+    <h2>Station rating:</h2> <img *ngFor="let star of stars" src="assets/star.png">
+</div>
+
+<div *ngIf="reviews.length > 0">
+    <h2>Reviews</h2> 
+    <app-admin-review *ngFor="let review of reviews" [review]="review"></app-admin-review>
+  </div>
+  <div *ngIf="reviews.length === 0">
+    <p>No reviews found.</p>
+</div>
+
+<div class="change-model-container">
+    <form [formGroup]="modelForm" (ngSubmit)="onSubmit()">
+        <div>
+            <label>Name:</label>
+            <input type="text" formControlName="name">
+          </div>
+  
+          <div>
+            <label>Category:</label>
+            <select formControlName="category_id">
+                <option *ngFor="let category of categories" [value]="category.category_id">{{ category.category_id }}</option>
+            </select>
+          </div>
+  
+          <div>
+              <label>Description:</label>
+              <input type="text" formControlName="description">
+          </div>
+          <div>
+              <label>Wheel Size:</label>
+              <input type="number" formControlName="wheel_size">
+          </div>
+          <div>
+              <label>Manufacturer:</label>
+              <input type="text" formControlName="manufacturer">
+          </div>
+          <div>
+              <label>Brake type:</label>
+              <input type="text" formControlName="brake_type">
+          </div>
+          <div>
+              <label>Price per hour:</label>
+              <input type="number" formControlName="price">
+          </div>
+  
+      <button type="submit">Submit</button>
+    </form>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
+</div>
