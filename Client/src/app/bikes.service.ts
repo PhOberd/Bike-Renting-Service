@@ -39,4 +39,12 @@ export class BikesService {
 
     return this.http.post<any>(`${this.baseUrl}bikes`, formData, { headers });
   }
+
+  deleteBike(token: string, bikeId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.delete<any>(`${this.baseUrl}bikes/${bikeId}`, { headers });
+  }
 }

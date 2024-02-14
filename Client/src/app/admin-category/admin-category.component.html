@@ -1,4 +1,10 @@
 <div class="admin-category-container">
     <p><strong>Category id:</strong> {{category.category_id}}</p>
     <p><strong>Name:</strong> {{category.name}}</p> 
+
+    <button (click)="onCategoryDelete(category.category_id); $event.stopPropagation()">Delete</button>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
 </div>

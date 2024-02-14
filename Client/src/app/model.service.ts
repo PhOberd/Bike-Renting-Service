@@ -40,4 +40,12 @@ export class ModelService {
 
     return this.http.put<any>(`${this.baseUrl}models/${modelId}`, formData, { headers });
   }
+
+  deleteModel(token: string, modelId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.delete<any>(`${this.baseUrl}models/${modelId}`, { headers });
+  }
 }
