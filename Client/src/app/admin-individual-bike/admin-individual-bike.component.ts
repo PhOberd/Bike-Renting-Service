@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { BikesService } from '../bikes.service';
 import { AuthService } from '../auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin-individual-bike',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './admin-individual-bike.component.html',
   styleUrl: './admin-individual-bike.component.css'
 })
