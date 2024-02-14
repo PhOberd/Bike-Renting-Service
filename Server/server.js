@@ -21,14 +21,95 @@ const checkAuth = require('./check_auth');
 const loginRoutes = require('./login');
 app.use("/login", loginRoutes);
 
+const registerRoutes = require('./register');
+app.use("/register", registerRoutes);
+
 app.get("/", (req, res) => {
     
 	// TODO: set content type (from EX1)
-    res.header('Content-Type', 'text/html');
+    res.header('Content-Type', 'application/json');
 	
     res.status(200).send("EX4: This is a database-backed application which uses JWT");
 });
 
+app.get('/wallet', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const result = await pool.query('SELECT wallet FROM users WHERE user_id = $1', [userId]);
+        
+        if(result.rows.length === 0){
+            return res.status(401).json({message:`Invalid user ID`});
+        } else {
+            const balance = result.rows[0].wallet
+            console.log(balance);
+            res.json({ balance });
+        }
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/wallet/charge', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const { amount } = req.body;
+        const query = {
+            text: 'UPDATE users SET wallet = wallet + $1 WHERE user_id = $2',
+            values: [amount, userId],
+          };
+        
+          pool.query(query, (err, result) => {
+            if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Failed to update wallet balance' });
+            } else {
+              if (result.rowCount === 1) {
+                console.log('Wallet balance updated successfully');
+                res.status(200).json({ message: 'Wallet balance updated successfully' });
+              } else {
+                console.error('User not found or no wallet balance updated');
+                res.status(404).json({ message: 'User not found or no wallet balance updated' });
+              }
+            }
+          });
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/wallet/use', checkAuth, async (req, res) => {
+
+    try{
+        const userId = req.userData.userId;
+        const { amount } = req.body;
+        const query = {
+            text: 'UPDATE users SET wallet = wallet - $1 WHERE user_id = $2',
+            values: [amount, userId],
+          };
+        
+          pool.query(query, (err, result) => {
+            if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Failed to update wallet balance' });
+            } else {
+              if (result.rowCount === 1) {
+                console.log('Wallet balance updated successfully');
+                res.status(200).json({ message: 'Wallet balance updated successfully' });
+              } else {
+                console.error('User not found or no wallet balance updated');
+                res.status(404).json({ message: 'User not found or no wallet balance updated' });
+              }
+            }
+          });
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // Code for all the stations--------------------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +127,32 @@ app.get('/stations',checkAuth, async (req, res) => {
     }
 });
 
+app.get('/stations/:stationId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const stationId = req.params.stationId;
+        const stationQuery = {
+            text: 'SELECT * FROM bike_stations WHERE station_id = $1',
+            values: [stationId]
+        };
+
+        const result = await pool.query(stationQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Station not found' });
+        }
+
+        const station = result.rows[0];
+        res.json(station);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 //route creates a new station in the database (admin)
 app.post('/stations', checkAuth, async (req, res) => {
     if(!req.userData.isAdmin){
@@ -57,6 +164,15 @@ app.post('/stations', checkAuth, async (req, res) => {
         // Validate input data
         if (!name || !address || !latitude || !longitude) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        const testQuery = {
+            text: 'SELECT * FROM bike_stations WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(409).json({ message: 'Station name already exists' });
         }
 
         // Insert new station into the database
@@ -147,6 +263,33 @@ app.put('/stations/:stationId',checkAuth, async (req, res) => {
 
 //routes for the categories---------------------------------------------------------------------------------------------------------------------------
 
+//returning specific category by id
+app.get('/categories/:categoryId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const categoryId = req.params.categoryId;
+        const categoryQuery = {
+            text: 'SELECT * FROM bike_categories WHERE category_id = $1',
+            values: [categoryId]
+        };
+
+        const result = await pool.query(categoryQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        const category = result.rows[0];
+        res.json(category);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 //returning a list with all categories
 app.get('/categories',checkAuth, async (req, res) => {
 
@@ -172,6 +315,16 @@ app.post('/categories', checkAuth, async (req, res) => {
         // Validate input data
         if (!name ) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        
+        const testQuery = {
+            text: 'SELECT * FROM bike_categories WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(409).json({ message: 'Category name already exists' });
         }
 
         // Insert new category into the database
@@ -260,7 +413,6 @@ app.delete('/categories/:categoryId', checkAuth, async (req, res) => {
 });
 
 //routes for the models-----------------------------------------------------------------------------------------------------------------------------
-
 app.get('/models',checkAuth, async (req, res) => {
 
     try{
@@ -268,6 +420,33 @@ app.get('/models',checkAuth, async (req, res) => {
         const result = await pool.query(`SELECT * FROM bike_models`);
         models = result.rows;
         res.json(models);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//returning specific category by id
+app.get('/models/:modelId',checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const modelId = req.params.modelId;
+        const modelQuery = {
+            text: 'SELECT * FROM bike_models WHERE model_id = $1',
+            values: [modelId]
+        };
+
+        const result = await pool.query(modelQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Model not found' });
+        }
+
+        const model = result.rows[0];
+        res.json(model);
     }catch(error){
         console.error('Error querying database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -285,6 +464,15 @@ app.post('/models', checkAuth, async (req, res) => {
         // Validate input data
         if (!name || !category_id || !description || !wheel_size || !manufacturer || !brake_type || !price) {
             return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        const testQuery = {
+            text: 'SELECT * FROM bike_models WHERE name = $1',
+            values: [name],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(405).json({ message: 'Model name already exists' });
         }
 
         // Insert new model into the database
@@ -486,7 +674,6 @@ app.delete('/bikes/:bikeId', checkAuth, async (req, res) => {
 });
 
 //routes for assigned bikes to stations
-
 app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
 
     try {
@@ -504,7 +691,35 @@ app.get('/stations/:stationId/bikes',checkAuth, async (req, res) => {
         };
 
         const result = await pool.query(query);
+        res.status(200).json({ bikes: result.rows });
+    } catch (error) {
+        console.error('Error getting bikes for the station:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
+//get all free bikes
+app.get('/stations/:stationId/free-bikes',checkAuth, async (req, res) => {
+
+    try {
+        const stationId = req.params.stationId;
+
+        // Validate stationId
+        if (!stationId || isNaN(stationId)) {
+            return res.status(400).json({ message: 'Invalid stationId' });
+        }
+
+        // Query to get bikes assigned to the specific station
+        const query = {
+            text: `SELECT ib.bike_id, bm.model_id as model_id, bc.category_id as category_id, 
+            ib.bike_id as id, bm.name as model_name, bc.name as category_name, bm.wheel_size, 
+            bm.manufacturer, bm.brake_type, bm.price as pph FROM individual_bikes ib, bike_models bm, 
+            bike_categories bc WHERE station_id = $1 AND ib.model_id = bm.model_id AND 
+            bm.category_id = bc.category_id AND ib.status = 'Free'`,
+            values: [stationId],
+        };
+
+        const result = await pool.query(query);
         res.status(200).json({ bikes: result.rows });
     } catch (error) {
         console.error('Error getting bikes for the station:', error);
@@ -603,17 +818,20 @@ app.get('/booking-tickets',checkAuth, async (req, res) => {
 //creating a new ticket
 app.post('/booking-tickets', checkAuth, async (req, res) => {
     try {
-        const {user_id, model_id, category_id, start_time, end_time, price, status} = req.body;
+        const data = { category_id, end_time, model_id, price, start_time, status, station_id, bike_id } = req.body.ticket;
+        const userId = req.userData.userId;
 
         // Validate input data
-        if (!user_id|| !model_id|| !category_id|| !start_time|| !end_time|| !price|| !status) {
+        if (!userId|| !model_id|| !category_id|| !start_time|| !end_time|| !price|| !status) {
             return res.status(400).json({ message: 'Invalid input data' });
         }
 
         // Insert new ticket into the database
         const query = {
-            text: 'INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            values: [user_id, model_id, category_id, start_time, end_time, price, status],
+            text: `INSERT INTO tickets (user_id, model_id, category_id, start_time, end_time, price, status, station_id, bike_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *`,
+            values: [userId, model_id, category_id, start_time, end_time, price, status, station_id, bike_id],
         };
 
         const result = await pool.query(query);
@@ -684,6 +902,31 @@ app.delete('/booking_tickets/:ticketId', checkAuth, async (req, res) => {
         res.status(200).json({ message: 'ticket deleted successfully' });
     } catch (error) {
         console.error('Error deleting ticket:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//change ticket status
+app.patch('/booking-tickets/:ticketId/status', checkAuth, async (req, res) => {
+    const ticketId = req.params.ticketId;
+    const { status } = req.body;
+
+    try {
+        const result = await pool.query(`
+            UPDATE tickets 
+            SET status = $1
+            WHERE ticket_id = $2
+            RETURNING *`,
+            [status, ticketId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Ticket not found' });
+        }
+
+        const updatedTicket = result.rows[0];
+        res.status(200).json(updatedTicket);
+    } catch (error) {
+        console.error('Error updating ticket status in database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -947,7 +1190,7 @@ app.delete('/users/:userId/wallet',checkAuth, async (req, res) => {
 //routes for managing reviews
 
 //route for returning reviews for a specific station
-app.get('/stations/s:stationId/reviews',checkAuth, async (req, res) => {
+app.get('/stations/:stationId/reviews',checkAuth, async (req, res) => {
     const stationId = req.params.stationId;
 
     try {
@@ -968,13 +1211,13 @@ app.get('/stations/s:stationId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for returning reviews for a specific model
-app.get('/stations/m:modelId/reviews',checkAuth, async (req, res) => {
+app.get('/models/:modelId/reviews',checkAuth, async (req, res) => {
     const modelId = req.params.modelId;
 
     try {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM reviews WHERE model_id = $1', [modelId]);
-        const reviews = result.rows[0];
+        const reviews = result.rows;
 
         if (!reviews) {
             res.status(404).json({ message: 'No reviews' });
@@ -989,7 +1232,6 @@ app.get('/stations/m:modelId/reviews',checkAuth, async (req, res) => {
 });
 
 //route for writing  reviews
-
 app.post("/booking-tickets/:ticketId/reviews", checkAuth, async(req, res) => {
 
     const { rating, comment } = req.body;
@@ -1025,7 +1267,124 @@ app.post("/booking-tickets/:ticketId/reviews", checkAuth, async(req, res) => {
     }
 });
 
-  
+//post review
+app.post('/tickets/reviews',checkAuth, async (req, res) => {
+    const data = { model_id, station_id, reviewText, rating } = req.body;
+    const userId = req.userData.userId;
+
+    try {
+        const result = await pool.query(`
+            INSERT INTO reviews (user_id, model_id, station_id, rating, comment)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *`,
+            [userId, model_id, station_id, rating, reviewText]);
+
+        const review = result.rows[0];
+        res.status(200).json(review);
+    } catch (error) {
+        console.error('Error inserting review into database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//change bike status
+app.patch('/bikes/:bikeId/status', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+    const { status } = req.body;
+
+    try {
+        const result = await pool.query(`
+            UPDATE individual_bikes 
+            SET status = $1
+            WHERE bike_id = $2
+            RETURNING *`,
+            [status, bikeId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedBike = result.rows[0];
+        res.status(200).json(updatedBike);
+    } catch (error) {
+        console.error('Error updating ticket status in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//change bikeId to empty in parking places
+app.patch('/parking-places/:bikeId/empty', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+
+    try {
+        const result = await pool.query(`
+            UPDATE parking_places 
+            SET bike_id = null
+            WHERE bike_id = $1
+            RETURNING *`,
+            [bikeId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedParkingPlace = result.rows[0];
+        res.status(200).json(updatedParkingPlace);
+    } catch (error) {
+        console.error('Error updating parking place in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//assign parking_place for bikeId
+app.patch('/parking-places/:bikeId/assign', checkAuth, async (req, res) => {
+    const bikeId = req.params.bikeId;
+    const {parkingPlace, station_id} = req.body;
+
+    try {
+        const result = await pool.query(`
+            UPDATE parking_places 
+            SET bike_id = $1
+            WHERE station_id = $2
+            AND number = $3
+            RETURNING *`,
+            [bikeId, station_id, parkingPlace]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const updatedParkingPlace = result.rows[0];
+        res.status(200).json(updatedParkingPlace);
+    } catch (error) {
+        console.error('Error updating parking place in database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//get free stations and parking_places for categoryId
+app.get('/parking-places/:categoryId/free',checkAuth, async (req, res) => {
+
+    try{
+        const categoryId = req.params.categoryId;
+
+        // Validate stationId
+        if (!categoryId || isNaN(categoryId)) {
+            return res.status(400).json({ message: 'Invalid categoryId' });
+        }
+
+        let parking_places = [];
+        const result = await pool.query(`SELECT station_id, number FROM parking_places WHERE category_id = $1 AND bike_id IS NULL`, 
+        [categoryId]);
+
+        parking_places = result.rows;
+        res.json(parking_places);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 let port = 3000;
 app.listen(port);
 console.log("Server running at: http://localhost:"+port);

@@ -8,7 +8,7 @@ let pool = /* from EX3: write your code to initialize connection pool using node
     user:`postgres`,
     host:`localhost`,
     database:`postgres`,
-    password:`1234`,
+    password:`12345`,
     port: 5432,
 });
 

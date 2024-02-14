@@ -1,0 +1,31 @@
+.create-category-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+  }
+
+.create-category-container h2 {
+    text-align: center;
+  }
+
+.create-category-container input[type="text"] {
+    display: block;
+    width: calc(100% - 20px); /* 100% minus padding(left & right) */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #AAAAAA;
+    border-radius: 5px;
+  }
+
+.create-category-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }

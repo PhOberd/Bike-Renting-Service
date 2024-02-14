@@ -1,0 +1,24 @@
+.bike-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+    margin-bottom: 10px;
+  }
+
+.bike-container h2 {
+    text-align: center;
+  }
+
+.bike-container button {
+    display: block;
+    width: 50%;
+    padding: 10px;
+    margin: auto;
+    margin-bottom: 20px;
+    background-color: green;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

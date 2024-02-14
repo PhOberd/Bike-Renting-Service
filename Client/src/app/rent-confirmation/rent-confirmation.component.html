@@ -1,0 +1,31 @@
+<div class="rent-confirmation-container">
+    <h2>Rent Confirmation</h2>
+    <div>
+        <p><strong>Bike model:</strong> {{ selectedBike.model_name }}</p>
+        <p><strong>Bike id:</strong> {{ selectedBike.id }}</p>
+        <p><strong>Category:</strong> {{ selectedBike.category_name }}</p>
+        <p><strong>Wheel size:</strong> {{ selectedBike.wheel_size }}</p>
+        <p><strong>Manufacturer:</strong> {{ selectedBike.manufacturer }}</p>
+        <p><strong>Brake type:</strong> {{ selectedBike.brake_type }}</p>
+        <p><strong>Price:</strong> {{ price }} EUR</p>
+
+        <div *ngIf="!isRentNow">
+            <label for="startDate">Start Date of your rent:</label>
+            <input type="datetime-local" id="startDate" [(ngModel)]="startDate" [value]="getCurrentDate()" [min]="getCurrentDate()"><br>
+        </div>
+
+        <label for="rentHours">Select amount of hours (1-24h):</label>
+        <input type="number" value="1" min="1" max="24" [(ngModel)]="selectedRentHours"
+        (ngModelChange)="calculatePrice()">
+
+        <br>
+        <button type="button" (click)="confirm()">Confirm</button> 
+
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+    </div>
+</div>

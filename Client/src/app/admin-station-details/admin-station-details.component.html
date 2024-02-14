@@ -1,0 +1,44 @@
+<div class="admin-station-details-container">
+    <h1>{{stationDetails?.name}}</h1>
+    <div class="rating-container">
+        <h2>Station rating:</h2> <img *ngFor="let star of stars" src="assets/star.png">
+    </div>
+    <p><strong>Id:</strong> {{stationDetails?.station_id}}</p>
+    <p><strong>Address:</strong> {{stationDetails?.address}} </p>
+    <p><strong>Latitude:</strong> {{stationDetails?.latitude}}</p>
+    <p><strong>Longitude:</strong> {{stationDetails?.longitude}}</p> 
+
+    <div *ngIf="reviews.length > 0">
+        <h2>Reviews</h2> 
+        <app-admin-review *ngFor="let review of reviews" [review]="review"></app-admin-review>
+      </div>
+      <div *ngIf="reviews.length === 0">
+        <p>No reviews found.</p>
+    </div>
+</div>
+
+<div class="change-station-container">
+    <form [formGroup]="stationForm" (ngSubmit)="onSubmit()">
+        <div>
+          <label>Name:</label>
+          <input type="text" formControlName="name">
+        </div>
+        <div>
+          <label>Address:</label>
+          <input type="text" formControlName="address">
+        </div>
+        <div>
+          <label>Latitude:</label>
+          <input type="text" formControlName="latitude" pattern="\d+(\.\d+)?">
+        </div>
+        <div>
+            <label>Longitude:</label>
+            <input type="text" formControlName="longitude" pattern="\d+(\.\d+)?">
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    
+      <div *ngIf="message" class="message">
+        {{ message }}
+      </div>
+</div>

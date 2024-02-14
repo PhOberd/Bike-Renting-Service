@@ -1,0 +1,49 @@
+<div class="ticket-container">
+    <p><strong>Model id:</strong> {{ticket.model_id}}</p>
+    <p><strong>Category id:</strong> {{ticket.category_id}}</p>
+    <p><strong>Station id:</strong> {{ticket.station_id}}</p>
+    <p><strong>Start time:</strong> {{ticket.start_time}}</p>
+    <p><strong>End time:</strong> {{ticket.end_time}}</p>
+    <p><strong>Ticket status:</strong> {{ticket.status}}</p>
+    <p><strong>Price:</strong> {{ticket.price}}</p>
+
+    <div *ngIf="ticket.status === 'Used'">
+        <button type="button" (click)="toggleReview()">Review</button>
+        <div *ngIf="showReview">
+            <app-review [ticket]="ticket" (reviewed)="handleReviewed()"></app-review>
+        </div> 
+    </div>
+    
+    <div *ngIf="ticket.status === 'Active'">
+        <div *ngIf="parkingPlaces && parkingPlaces.length > 0">
+            <label>Select Station:</label>
+            <select [(ngModel)]="selectedStation" (change)="onStationSelectionChange()">
+                <option disabled [ngValue]="-1" selected>Select a station</option>
+              <option *ngFor="let station of stations">{{ station }}</option>
+            </select>
+            <br>
+            <label>Select Parking place number:</label>
+            <select [(ngModel)]="selectedParkingPlace" [disabled]="!selectedStation">
+                <option disabled [ngValue]="-1" selected>Select a parking place number</option>
+            <option *ngFor="let number of parkingPlaceNumbers">{{ number }}</option>
+            </select>
+          </div>
+          <br>
+          <button type="button" (click)="parkBike()">Park bike</button>
+    </div>    
+
+    <div *ngIf="ticket.status === 'Inactive'">
+        <button type="button" (click)="useBike()" *ngIf="isUseable">Use bike</button>
+        <button type="button" (click)="returnTicket()" *ngIf="isReturnable">Return ticket</button>  
+        <div *ngIf="qrCodeData">
+            <img [src]="qrCodeData" alt="QR Code">
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+</div>

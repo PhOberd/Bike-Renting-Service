@@ -1,0 +1,19 @@
+<div class="navbar">
+    <a (click)="navigateToBikeStations()">Stations</a>
+    <div class="right">
+        <ng-container *ngIf="isLoggedIn(); else notLoggedIn">
+            <div class="dropdown">
+                <button class="dropbtn">My Profile</button>
+                <div class="dropdown-content">
+                  <a (click)="navigateToWallet()">Wallet</a>
+                  <a (click)="navigateToTickets()">Tickets</a>
+                  <a (click)="logout()">Logout</a>
+                </div>
+              </div>           
+        </ng-container>
+        <ng-template #notLoggedIn>
+            <a (click)="navigateToLogin()">Login</a>
+            <a (click)="navigateToRegister()">Register</a>
+        </ng-template>
+    </div>
+</div>

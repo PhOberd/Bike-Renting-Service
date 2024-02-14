@@ -1,0 +1,11 @@
+<div class="bike-container">
+    <p><strong>Bike model:</strong> {{bike.model_name}}</p>
+    <p><strong>Bike id:</strong> {{bike.id}}</p>
+    <p><strong>Category:</strong> {{bike.category_name}}</p>
+    <p><strong>Wheel size:</strong> {{bike.wheel_size}}</p>
+    <p><strong>Manufacturer:</strong> {{bike.manufacturer}}</p>
+    <p><strong>Brake type:</strong> {{bike.brake_type}}</p>
+    <p><strong>Price per hour:</strong> {{bike.pph}} EUR</p>
+    <button type="button" (click)="rentNow()">Rent now</button> 
+    <button type="button" (click)="rentLater()">Rent later</button> 
+</div>
