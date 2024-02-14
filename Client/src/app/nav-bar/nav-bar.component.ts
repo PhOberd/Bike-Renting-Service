@@ -41,4 +41,24 @@ export class NavBarComponent {
     this.authService.logout();
     this.router.navigate(['/']);
   }
+
+  navigateToAdminStations(){
+    this.router.navigateByUrl('admin/stations');
+  }
+
+  navigateToAdminCategories(){
+    this.router.navigateByUrl('admin/categories');
+  }
+
+  navigateToAdminModels(){
+    this.router.navigateByUrl('admin/models');
+  }
+
+  navigateToAdminBikes(){
+    this.router.navigateByUrl('admin/bikes');
+  }
+
+  isAdmin(): boolean{
+    return this.authService.isAdmin();
+  }
 }

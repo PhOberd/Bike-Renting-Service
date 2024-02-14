@@ -1,5 +1,11 @@
 <div class="navbar">
     <a (click)="navigateToBikeStations()">Stations</a>
+    <ng-container *ngIf="isAdmin();">
+        <a (click)="navigateToAdminStations()">Admin Stations</a>
+        <a (click)="navigateToAdminCategories()">Admin Categories</a>
+        <a (click)="navigateToAdminModels()">Admin Models</a>
+        <a (click)="navigateToAdminBikes()">Admin Bikes</a>
+    </ng-container>
     <div class="right">
         <ng-container *ngIf="isLoggedIn(); else notLoggedIn">
             <div class="dropdown">

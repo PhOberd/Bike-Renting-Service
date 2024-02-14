@@ -47,4 +47,13 @@ export class AuthService {
     }
     return null;
   }
+
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (token) {
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      return tokenPayload.isAdmin;
+    }
+    return false;
+  }
 }
