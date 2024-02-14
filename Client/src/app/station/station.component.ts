@@ -56,7 +56,7 @@ export class StationComponent {
   fetchBikes() {
     const token = this.authService.getToken();
     if (token) {
-      this.bikesService.getBikes(token, this.stationId).subscribe(
+      this.bikesService.getBikesByStationId(token, this.stationId).subscribe(
         (bikes) => {
           this.originalBikes = bikes.bikes
           this.getFilteredValues();

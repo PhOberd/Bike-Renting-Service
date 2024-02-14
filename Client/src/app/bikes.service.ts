@@ -10,11 +10,18 @@ export class BikesService {
 
   constructor(private http: HttpClient) { }
 
-  getBikes(token: string, stationId: string): Observable<any> {
+  getBikesByStationId(token: string, stationId: string): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
     });
     return this.http.get<any>(`${this.baseUrl}stations/${stationId}/free-bikes`, { headers });
+  }
+
+  getBikes(token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.get<any>(`${this.baseUrl}bikes`, { headers });
   }
 
   changeBikeStatus(token: string, bikeId: string, status: string): Observable<any> {
@@ -23,5 +30,13 @@ export class BikesService {
     });
 
     return this.http.patch<any>(`${this.baseUrl}bikes/${bikeId}/status`, { status }, { headers });
+  }
+
+  postBike(token: string, formData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.post<any>(`${this.baseUrl}bikes`, formData, { headers });
   }
 }

@@ -11,6 +11,8 @@ import { AdminModelsComponent } from './admin-models/admin-models.component';
 import { AdminStationDetailsComponent } from './admin-station-details/admin-station-details.component';
 import { AdminCategoryDetailsComponent } from './admin-category-details/admin-category-details.component';
 import { AdminModelDetailsComponent } from './admin-model-details/admin-model-details.component';
+import { AdminIndividualBikesComponent } from './admin-individual-bikes/admin-individual-bikes.component';
+import { AdminIndividualBikeDetailsComponent } from './admin-individual-bike-details/admin-individual-bike-details.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -25,4 +27,6 @@ export const routes: Routes = [
     { path: 'admin/categories/:Id', component: AdminCategoryDetailsComponent },
     { path: 'admin/models', component: AdminModelsComponent },
     { path: 'admin/models/:Id', component: AdminModelDetailsComponent },
+    { path: 'admin/bikes', component: AdminIndividualBikesComponent },
+    { path: 'admin/bikes/:Id', component: AdminIndividualBikeDetailsComponent }
 ];

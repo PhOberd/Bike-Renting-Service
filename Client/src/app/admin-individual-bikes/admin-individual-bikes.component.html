@@ -1,1 +1,37 @@
-<p>admin-individual-bikes works!</p>
+<div *ngFor="let bike of bikes" (click)="onBikeClick(bike.bike_id)">
+    <app-admin-individual-bike [bike]="bike"></app-admin-individual-bike>
+</div>
+
+<div class="create-bike-container">
+    <form [formGroup]="bikeForm" (ngSubmit)="onSubmit()">
+        <div>
+            <label>Model:</label>
+            <select formControlName="model_id">
+                <option *ngFor="let model of models" [value]="model.model_id">{{ model.model_id }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Unique Id:</label>
+            <input type="text" formControlName="unique_id">
+        </div>
+
+        <div>
+            <label>Station:</label>
+            <select formControlName="station_id">
+                <option *ngFor="let station of stations" [value]="station.station_id">{{ station.station_id }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Status:</label>
+            <input type="text" formControlName="status">
+        </div>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+      </div>
+</div>
