@@ -17,6 +17,22 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+ALTER SCHEMA public OWNER TO postgres;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS '';
+
+
+--
 -- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -79,8 +95,6 @@ CREATE TABLE public.bike_models (
     description text,
     wheel_size integer,
     manufacturer character varying(255),
-    brake_type character varying(255),
-    price numeric(6,2)
     brake_type character varying(255),
     price numeric(6,2)
 );
@@ -193,8 +207,6 @@ CREATE TABLE public.parking_places (
     place_id integer NOT NULL,
     station_id integer,
     number integer NOT NULL,
-    category_id integer,
-    bike_id integer
     category_id integer,
     bike_id integer
 );
@@ -403,12 +415,11 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 --
 
 COPY public.bike_categories (category_id, name) FROM stdin;
-9	Mountain Bikes
-10	Electric Bikes
 11	Children Bikes
 12	City Bikes
 14	Same Bike
-14	Same Bike
+9	Mountain Bikes
+10	Electric bikes
 \.
 
 
@@ -437,6 +448,7 @@ COPY public.bike_stations (station_id, name, address, latitude, longitude) FROM 
 12	Woerthersee Stadion	Address2	46.612700	14.281817
 13	Klinikum Klagenfurt	Address3	46.635700	14.311817
 14	Klagenfurt Hbf	Adress4	46.616700	14.311817
+17	Station 5	Address5	46.638700	14.241817
 \.
 
 
@@ -451,15 +463,15 @@ COPY public.individual_bikes (bike_id, model_id, unique_id, station_id, status) 
 5	5	MTN003	13	Free
 6	8	EL003	14	Free
 7	5	MTN004	13	Free
-8	8	EL004	14	Free
 9	4	CH001	11	Free
 10	4	CH002	12	Free
 11	7	CH003	13	Free
 12	7	CH004	14	Free
 13	6	CI001	11	Free
-14	3	CI002	12	Free
 15	3	CI003	14	Free
 1	1	MTN001	11	Free
+8	8	EL004	14	Free
+14	3	CI002	12	Free
 \.
 
 
@@ -470,7 +482,6 @@ COPY public.individual_bikes (bike_id, model_id, unique_id, station_id, status) 
 COPY public.parking_places (place_id, station_id, number, category_id, bike_id) FROM stdin;
 25	11	3	9	\N
 29	12	7	10	\N
-31	11	7	11	\N
 33	12	9	11	\N
 34	12	10	11	\N
 36	11	9	12	\N
@@ -479,7 +490,6 @@ COPY public.parking_places (place_id, station_id, number, category_id, bike_id) 
 17	11	1	9	\N
 20	12	2	12	\N
 38	13	1	9	\N
-40	13	4	10	\N
 42	13	5	10	\N
 43	13	6	11	\N
 44	13	7	11	\N
@@ -495,17 +505,19 @@ COPY public.parking_places (place_id, station_id, number, category_id, bike_id) 
 54	13	9	12	11
 28	12	6	10	10
 35	11	10	12	9
-48	14	3	10	8
 41	13	3	9	7
 45	13	8	12	\N
 49	14	4	10	6
 39	13	2	9	5
 18	11	2	10	4
 21	12	5	9	3
-19	12	1	11	14
 32	11	8	11	13
 51	14	6	11	15
 23	12	3	9	1
+48	14	3	10	\N
+40	13	4	10	8
+19	12	1	11	\N
+31	11	7	11	14
 \.
 
 
@@ -517,7 +529,8 @@ COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) 
 1	1	1	11	5	Cool!
 2	2	2	12	4	Jo geht eh!
 3	1	1	11	4	supi dupi!
-3	1	1	11	4	supi dupi!
+4	5	8	14	3	Cooles bike
+5	2	1	11	4	Test
 \.
 
 
@@ -526,7 +539,10 @@ COPY public.reviews (review_id, user_id, model_id, station_id, rating, comment) 
 --
 
 COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_time, price, status, station_id, bike_id) FROM stdin;
-1	2	1	9	2024-02-13 11:55:08.05	2024-02-13 12:55:08.05	2.00	Used	11	1
+2	5	8	10	2024-02-13 13:58:43.843	2024-02-13 23:58:43.843	50.00	Reviewed	14	8
+1	2	1	9	2024-02-13 11:55:08.05	2024-02-13 12:55:08.05	2.00	Reviewed	11	1
+3	2	3	11	2024-02-14 09:03:23.323	2024-02-14 12:03:23.323	10.50	Used	12	14
+4	2	3	11	2024-02-14 12:12:00	2024-02-14 14:12:00	7.00	Returned	14	15
 \.
 
 
@@ -537,7 +553,8 @@ COPY public.tickets (ticket_id, user_id, model_id, category_id, start_time, end_
 COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
 3	admin	admin	0.00	t
 1	user1@example.com	password1	100.00	f
-2	user2@example.com	password2	123.00	f
+5	user4@example.com	password4	50.00	f
+2	user2@example.com	password2	142.50	f
 \.
 
 
@@ -545,32 +562,28 @@ COPY public.users (user_id, email, password, wallet, isadmin) FROM stdin;
 -- Name: bike_categories_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 14, true);
-SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 14, true);
+SELECT pg_catalog.setval('public.bike_categories_category_id_seq', 17, true);
 
 
 --
 -- Name: bike_models_model_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
-SELECT pg_catalog.setval('public.bike_models_model_id_seq', 23, true);
+SELECT pg_catalog.setval('public.bike_models_model_id_seq', 25, true);
 
 
 --
 -- Name: bike_stations_station_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 16, true);
-SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 16, true);
+SELECT pg_catalog.setval('public.bike_stations_station_id_seq', 19, true);
 
 
 --
 -- Name: individual_bikes_bike_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 5, true);
-SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 5, true);
+SELECT pg_catalog.setval('public.individual_bikes_bike_id_seq', 22, true);
 
 
 --
@@ -584,23 +597,21 @@ SELECT pg_catalog.setval('public.parking_places_place_id_seq', 20, true);
 -- Name: reviews_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reviews_review_id_seq', 3, true);
-SELECT pg_catalog.setval('public.reviews_review_id_seq', 3, true);
+SELECT pg_catalog.setval('public.reviews_review_id_seq', 5, true);
 
 
 --
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, true);
+SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 36, true);
 
 
 --
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 4, true);
-SELECT pg_catalog.setval('public.users_user_id_seq', 4, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 5, true);
 
 
 --
@@ -745,6 +756,13 @@ ALTER TABLE ONLY public.tickets
 
 ALTER TABLE ONLY public.tickets
     ADD CONSTRAINT tickets_model_id_fkey FOREIGN KEY (model_id) REFERENCES public.bike_models(model_id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 
 
 --
