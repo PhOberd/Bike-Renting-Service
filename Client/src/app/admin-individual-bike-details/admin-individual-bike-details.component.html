@@ -1,1 +1,39 @@
-<p>admin-individual-bike-details works!</p>
+<p><strong>Id:</strong> {{bikeDetails?.bike_id}}</p>
+<p><strong>Model Id:</strong> {{bikeDetails?.model_id}}</p>
+<p><strong>Unique Id:</strong> {{bikeDetails?.unique_id}}</p>
+<p><strong>Station Id:</strong> {{bikeDetails?.station_id}}</p>
+<p><strong>Status:</strong> {{bikeDetails?.status}}</p>
+
+<div class="change-bike-container">
+    <form [formGroup]="bikeForm" (ngSubmit)="onSubmit()">
+        <div>
+            <label>Model:</label>
+            <select formControlName="model_id">
+                <option *ngFor="let model of models" [value]="model.model_id">{{ model.model_id }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Unique Id:</label>
+            <input type="text" formControlName="unique_id">
+        </div>
+
+        <div>
+            <label>Station:</label>
+            <select formControlName="station_id">
+                <option *ngFor="let station of stations" [value]="station.station_id">{{ station.station_id }}</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Status:</label>
+            <input type="text" formControlName="status">
+        </div>
+    
+      <button type="submit">Submit</button>
+    </form>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
+</div>

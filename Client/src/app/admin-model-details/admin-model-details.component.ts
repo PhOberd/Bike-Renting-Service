@@ -125,13 +125,11 @@ export class AdminModelDetailsComponent implements OnInit {
           this.modelService.changeModel(token, this.modelForm.value, this.modelId).subscribe(
             (response: any) => {
               this.message = "Model succesfully changed!";
-              console.log('Form data posted successfully:', response);
               this.modelForm.reset();
               this.getModelDetails();
             },
             (error: any) => {
               this.message = `Error changing model: ${error.error.message}`
-              console.error('Error changing model:', error.error.message);
             }
           )
         } else {
@@ -139,7 +137,6 @@ export class AdminModelDetailsComponent implements OnInit {
         }
       } else {
         this.message = "Invalid data!";
-        console.error('Invalid data!');
       }
     }
 }

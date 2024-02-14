@@ -1,0 +1,32 @@
+.change-bike-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+  }
+
+.change-bike-container h2 {
+    text-align: center;
+  }
+
+.change-bike-container input[type="text"],
+.change-bike-container select {
+    display: block;
+    width: calc(100% - 20px); /* 100% minus padding(left & right) */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #AAAAAA;
+    border-radius: 5px;
+  }
+
+.change-bike-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }

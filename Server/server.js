@@ -575,6 +575,32 @@ app.get('/bikes', checkAuth, async (req, res) => {
     }
 });
 
+app.get('/bikes/:bikeId', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const bikeId = req.params.bikeId;
+        const bikeQuery = {
+            text: 'SELECT * FROM individual_bikes WHERE bike_id = $1',
+            values: [bikeId]
+        };
+
+        const result = await pool.query(bikeQuery);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
+        }
+
+        const bike = result.rows[0];
+        res.json(bike);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 //creating a new bike (admin)
 app.post('/bikes', checkAuth, async (req, res) => {
     if(!req.userData.isAdmin){

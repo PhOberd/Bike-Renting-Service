@@ -17,6 +17,13 @@ export class BikesService {
     return this.http.get<any>(`${this.baseUrl}stations/${stationId}/free-bikes`, { headers });
   }
 
+  getBikeById(token: string, bikeId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.get<any>(`${this.baseUrl}bikes/${bikeId}`, { headers });
+  }
+
   getBikes(token: string): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
@@ -46,5 +53,13 @@ export class BikesService {
     });
 
     return this.http.delete<any>(`${this.baseUrl}bikes/${bikeId}`, { headers });
+  }
+
+  changeBike(token: string, formData: any, bikeId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.put<any>(`${this.baseUrl}bikes/${bikeId}`, formData, { headers });
   }
 }

@@ -61,13 +61,11 @@ export class AdminCategoryDetailsComponent implements OnInit {
           this.categoryService.changeCategory(token, this.categoryForm.value, this.categoryId).subscribe(
             (response: any) => {
               this.message = "Category succesfully changed!";
-              console.log('Form data posted successfully:', response);
               this.categoryForm.reset();
               this.getCategoryDetails();
             },
             (error: any) => {
               this.message = `Error changing category: ${error.error.message}`
-              console.error('Error changing category:', error.error.message);
             }
           )
         } else {
@@ -75,7 +73,6 @@ export class AdminCategoryDetailsComponent implements OnInit {
         }
       } else {
         this.message = "Invalid data!";
-        console.error('Invalid data!');
       }
     }
 }

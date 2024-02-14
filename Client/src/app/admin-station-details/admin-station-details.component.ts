@@ -103,13 +103,11 @@ export class AdminStationDetailsComponent implements OnInit {
         this.stationsService.changeStation(token, this.stationForm.value, this.stationId).subscribe(
           (response: any) => {
             this.message = "Station succesfully changed!";
-            console.log('Form data posted successfully:', response);
             this.stationForm.reset();
             this.fetchStationDetails();
           },
           (error: any) => {
             this.message = `Error changing Station: ${error.error.message}`
-            console.error('Error changing Station:', error.error.message);
           }
         )
       } else {
@@ -117,7 +115,6 @@ export class AdminStationDetailsComponent implements OnInit {
       }
     } else {
       this.message = "Invalid data!";
-      console.error('Invalid data!');
     }
   }
 }
