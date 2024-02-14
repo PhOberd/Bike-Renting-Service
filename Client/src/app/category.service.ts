@@ -39,4 +39,12 @@ export class CategoryService {
 
     return this.http.put<any>(`${this.baseUrl}categories/${categoryId}`, formData, { headers });
   }
+
+  deleteCategory(token: string, categoryId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.delete<any>(`${this.baseUrl}categories/${categoryId}`, { headers });
+  }
 }

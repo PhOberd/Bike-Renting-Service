@@ -9,3 +9,15 @@
 .admin-model-container:hover {
   cursor: pointer;
 }
+
+.admin-model-container button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: blue;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

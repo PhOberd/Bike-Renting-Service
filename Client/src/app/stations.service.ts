@@ -33,4 +33,12 @@ export class StationsService {
 
     return this.http.put<any>(`${this.baseUrl}stations/${stationId}`, formData, { headers });
   }
+
+  deleteStation(token: string, stationId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.delete<any>(`${this.baseUrl}stations/${stationId}`, { headers });
+  }
 }

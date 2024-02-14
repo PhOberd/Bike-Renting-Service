@@ -4,4 +4,10 @@
     <p><strong>Unique Id:</strong> {{bike.unique_id}}</p> 
     <p><strong>Station Id:</strong> {{bike.station_id}}</p> 
     <p><strong>Status:</strong> {{bike.status}}</p> 
+
+    <button (click)="onBikeDelete(bike.bike_id); $event.stopPropagation()">Delete</button>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
 </div>

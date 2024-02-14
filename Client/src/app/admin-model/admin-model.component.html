@@ -7,4 +7,10 @@
     <p><strong>Manufacturer:</strong> {{model.manufacturer}}</p> 
     <p><strong>Brake type:</strong> {{model.brake_type}}</p> 
     <p><strong>Price per hour:</strong> {{model.price}}</p> 
+
+    <button (click)="onModelDelete(model.model_id); $event.stopPropagation()">Delete</button>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
 </div>

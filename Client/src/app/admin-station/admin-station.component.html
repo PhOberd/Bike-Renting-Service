@@ -3,5 +3,11 @@
     <p><strong>Name:</strong> {{station.name}}</p>
     <p><strong>Address:</strong> {{station.address}}</p>
     <p><strong>Latitude:</strong> {{station.latitude}}</p>
-    <p><strong>Longitude:</strong> {{station.longitude}}</p> 
+    <p><strong>Longitude:</strong> {{station.longitude}}</p>
+    
+    <button (click)="onStationDelete(station.station_id); $event.stopPropagation()">Delete</button>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
 </div>
