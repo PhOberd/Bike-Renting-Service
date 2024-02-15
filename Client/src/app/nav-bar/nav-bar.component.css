@@ -24,8 +24,6 @@
 }
 
 .dropdown .dropbtn {
-    font-family: inherit;
-    font-size: inherit;
     padding: 20px 20px;
     border: none;
     min-height: 60px;
@@ -43,7 +41,6 @@
     position: absolute;
     background-color: #f9f9f9;
     min-width: 160px;
-    box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
     z-index: 1000; /* so dropdown is visible in front of the map */
   }
   
