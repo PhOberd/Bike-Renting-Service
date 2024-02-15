@@ -86,7 +86,6 @@ export class AdminStationDetailsComponent implements OnInit {
       this.reviewService.getReviewsByStationID(token, this.stationId).subscribe(
         (reviews) => {
           this.reviews = reviews;
-          console.log(this.reviews);
         },
         (error) => {
           console.error('Error fetching reviews:', error);

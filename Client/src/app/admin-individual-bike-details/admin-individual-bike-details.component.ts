@@ -154,14 +154,12 @@ export class AdminIndividualBikeDetailsComponent implements OnInit {
     onStationChange(event: any) {
       this.selectedStationId = event.target.value;
       this.filteredParkingPlaces = this.filterParkingPlaces();
-      console.log(this.filteredParkingPlaces);
     }
 
     onModelChange(event: any) {
       this.selectedModelId = event.target.value;
       this.selectedCategoryId = this.getCategory();
       this.filteredParkingPlaces = this.filterParkingPlaces();
-      console.log(this.filteredParkingPlaces);
     }
 
     onParkingPlaceChange(event: any) {

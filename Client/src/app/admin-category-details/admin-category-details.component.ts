@@ -43,7 +43,6 @@ export class AdminCategoryDetailsComponent implements OnInit {
         this.categoryService.getCategoriesById(token, this.categoryId).subscribe(
           (categoryDetails) => {
             this.categoryDetails = categoryDetails;
-            console.log(this.categoryDetails);
           },
           (error) => {
             console.error('Error fetching category details:', error);

@@ -58,7 +58,6 @@ export class AdminModelDetailsComponent implements OnInit {
         this.categoryService.getCategories(token).subscribe(
           (categories) => {
             this.categories = categories;
-            console.log(this.categories);
           },
           (error) => {
             console.error('Error fetching categories:', error);
@@ -75,7 +74,6 @@ export class AdminModelDetailsComponent implements OnInit {
         this.modelService.getModelById(token, this.modelId).subscribe(
           (modelDetails) => {
             this.modelDetails = modelDetails;
-            console.log(this.modelDetails);
           },
           (error) => {
             console.error('Error fetching model details:', error);
@@ -92,7 +90,6 @@ export class AdminModelDetailsComponent implements OnInit {
         this.reviewService.getRatioByModelId(token, this.modelId).subscribe(
           (average) => {
             this.stars = Array(average).fill(1);
-            console.log(this.stars)
         },
           (error) => {
             console.error('Error fetching reviews:', error);
@@ -107,7 +104,6 @@ export class AdminModelDetailsComponent implements OnInit {
         this.reviewService.getReviewsByModelId(token, this.modelId).subscribe(
           (reviews) => {
             this.reviews = reviews;
-            console.log(this.reviews);
           },
           (error) => {
             console.error('Error fetching reviews:', error);
