@@ -26,6 +26,30 @@ export class ParkingPlaceService {
     return this.http.get<any>(`${this.baseUrl}`, { headers });
   }
 
+  getParkingPlacesByStationId(token: string, stationId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/${stationId}`, { headers });
+  }
+
+  deleteParkingPlace(token: string, placeId: string){
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.delete<any>(`${this.baseUrl}/${placeId}`, { headers });
+  }
+
+  postParkingPlace(token: string, stationId: string, formData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+
+    return this.http.post<any>(`${this.baseUrl}/${stationId}`, formData, { headers });
+  }
+
   emptyParkingPlaceByBikeId(token: string, bike_id: number): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token

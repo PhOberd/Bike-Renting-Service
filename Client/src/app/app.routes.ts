@@ -17,6 +17,7 @@ import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { AdminGuard } from './AdminGuard';
 import { AdminOverdueTicketsComponent } from './admin-overdue-tickets/admin-overdue-tickets.component';
 import { LogInGuard } from './LogInGuard';
+import { AdminParkingPlacesComponent } from './admin-parking-places/admin-parking-places.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -27,6 +28,7 @@ export const routes: Routes = [
     { path: 'stations/:Id', component: StationComponent, canActivate: [LogInGuard] },
     { path: 'admin/stations', component: AdminStationsComponent, canActivate: [AdminGuard] },
     { path: 'admin/stations/:Id', component: AdminStationDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/stations/:Id/parking-places', component: AdminParkingPlacesComponent, canActivate: [AdminGuard] },
     { path: 'admin/categories', component: AdminCategoriesComponent, canActivate: [AdminGuard] },
     { path: 'admin/categories/:Id', component: AdminCategoryDetailsComponent, canActivate: [AdminGuard] },
     { path: 'admin/models', component: AdminModelsComponent, canActivate: [AdminGuard] },

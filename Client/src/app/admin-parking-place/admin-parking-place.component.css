@@ -1,0 +1,10 @@
+.admin-parking-place-container {
+    width: 350px;
+    border-radius: 10px;
+    border: 1px solid #AAAAAA;
+    padding: 30px;
+  }
+
+.admin-parking-place-container h2 {
+    text-align: center;
+  }

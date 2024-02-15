@@ -1463,6 +1463,106 @@ app.get('/parking-places',checkAuth, async (req, res) => {
     }
 });
 
+
+//get all parking places for a specific station
+app.get('/parking-places/:stationId',checkAuth, async (req, res) => {
+
+    try{
+        const stationId = req.params.stationId;
+
+        // Validate stationId
+        if (!stationId || isNaN(stationId)) {
+            return res.status(400).json({ message: 'Invalid stationId' });
+        }
+
+        let parking_places = [];
+        const result = await pool.query(`SELECT * FROM parking_places WHERE station_id = $1`,
+        [stationId]);
+
+        parking_places = result.rows;
+        res.json(parking_places);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.delete('/parking-places/:placeId', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const placeId = req.params.placeId;
+
+    try {
+        // Checking for the existance
+        const placesQuery = {
+            text: 'SELECT * FROM parking_places WHERE placeId = $1',
+            values: [placeId]
+        };
+        const placesResult = await pool.query(placesQuery);
+
+        if (placesResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Place not found' });
+        }
+
+        // Deleting the station
+        const deleteQuery = {
+            text: 'DELETE FROM parking_places WHERE placeId = $1',
+            values: [placeId]
+        };
+        await pool.query(deleteQuery);
+
+        res.status(200).json({ message: 'Place deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting place:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/parking-places/:stationId', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+    try {
+        const stationId = req.params.stationId;
+
+        // Validate stationId
+        if (!stationId || isNaN(stationId)) {
+            return res.status(400).json({ message: 'Invalid stationId' });
+        }
+
+        const { number, category_id } = req.body;
+
+        // Validate input data
+        if (!stationId || !number || !category_id) {
+            return res.status(400).json({ message: 'Invalid input data' });
+        }
+
+        const testQuery = {
+            text: 'SELECT * FROM parking_places WHERE number = $1',
+            values: [number],
+        };
+        const testResult = await pool.query(testQuery);
+        if (testResult.rows.length > 0) {
+            return res.status(409).json({ message: 'Parking number already exists' });
+        }
+
+        // Insert new station into the database
+        const query = {
+            text: 'INSERT INTO parking_places (station_id, number, category_id) VALUES ($1, $2, $3) RETURNING *',
+            values: [stationId, number, category_id],
+        };
+
+        const result = await pool.query(query);
+
+        res.status(201).json({ message: 'Parking place created successfully', station: result.rows[0] });
+    } catch (error) {
+        console.error('Error creating parking place:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 let port = 3000;
 app.listen(port);
 console.log("Server running at: http://localhost:"+port);

@@ -6,6 +6,8 @@ import { ReviewService } from '../review.service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule  } from '@angular/forms';
 import { AdminReviewComponent } from '../admin-review/admin-review.component';
+import { ParkingPlaceService } from '../parking-place.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-station-details',
@@ -19,12 +21,12 @@ export class AdminStationDetailsComponent implements OnInit {
   stationDetails: any;
   stars: number[] = [];
   reviews: any[] = [];
-  parkingPlaces: any[] = [];
   stationForm: FormGroup;
   message = "";
 
   constructor(private formBuilder: FormBuilder, private route: ActivatedRoute, private authService: AuthService,
-    private stationsService: StationsService,  private reviewService: ReviewService) { 
+    private stationsService: StationsService,  private reviewService: ReviewService,
+    private parkingPlaceService: ParkingPlaceService, private router: Router) { 
       this.stationForm = this.formBuilder.group({
         name: ['', Validators.required],
         address: ['', Validators.required],
@@ -54,7 +56,6 @@ export class AdminStationDetailsComponent implements OnInit {
       this.stationsService.getStationById(token, this.stationId).subscribe(
         (stationDetails) => {
           this.stationDetails = stationDetails;
-          console.log(this.stationDetails);
         },
         (error) => {
           console.error('Error fetching station details:', error);
@@ -116,5 +117,9 @@ export class AdminStationDetailsComponent implements OnInit {
     } else {
       this.message = "Invalid data!";
     }
+  }
+
+  navigateToParkingPlaces(){
+    this.router.navigateByUrl(`/admin/stations/${this.stationDetails.station_id}/parking-places`);
   }
 }

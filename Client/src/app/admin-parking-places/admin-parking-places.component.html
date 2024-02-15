@@ -1,0 +1,29 @@
+<div *ngIf="parkingPlaces.length > 0">
+    <h2>Parking places for Station {{stationId}}</h2> 
+    <app-admin-parking-place *ngFor="let parkingPlace of parkingPlaces" [parkingPlace]="parkingPlace"></app-admin-parking-place>
+  </div>
+  <div *ngIf="parkingPlaces.length === 0">
+    <p>No parking places found.</p>
+</div>
+
+<div class="create-parking-place-container">
+  <form [formGroup]="parkingPlaceForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label>Number:</label>
+        <input type="number" formControlName="number">
+      </div>
+
+        <div>
+            <label>Category:</label>
+            <select formControlName="category_id">
+                <option *ngFor="let category of categories" [value]="category.category_id">{{ category.category_id }}</option>
+            </select>
+        </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  
+    <div *ngIf="message" class="message">
+      {{ message }}
+    </div>
+</div>

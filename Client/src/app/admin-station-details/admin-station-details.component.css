@@ -23,6 +23,18 @@
     border-radius: 5px;
   }
 
+button {
+    display: block;
+    width: 400px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
   .change-station-container button {
     display: block;
     width: 100%;
