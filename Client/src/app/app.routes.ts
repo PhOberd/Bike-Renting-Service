@@ -16,14 +16,15 @@ import { AdminIndividualBikeDetailsComponent } from './admin-individual-bike-det
 import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { AdminGuard } from './AdminGuard';
 import { AdminOverdueTicketsComponent } from './admin-overdue-tickets/admin-overdue-tickets.component';
+import { LogInGuard } from './LogInGuard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'wallet', component: WalletComponent },
+    { path: 'wallet', component: WalletComponent, canActivate: [LogInGuard] },
     { path: 'stations', component: StationsComponent },
-    { path: 'tickets', component: TicketsComponent },
-    { path: 'stations/:Id', component: StationComponent },
+    { path: 'tickets', component: TicketsComponent, canActivate: [LogInGuard] },
+    { path: 'stations/:Id', component: StationComponent, canActivate: [LogInGuard] },
     { path: 'admin/stations', component: AdminStationsComponent, canActivate: [AdminGuard] },
     { path: 'admin/stations/:Id', component: AdminStationDetailsComponent, canActivate: [AdminGuard] },
     { path: 'admin/categories', component: AdminCategoriesComponent, canActivate: [AdminGuard] },
