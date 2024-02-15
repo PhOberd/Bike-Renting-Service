@@ -1,3 +1,10 @@
+<div class="parking-place-capacity-container">
+  <h2>Capacity:</h2> 
+<div *ngFor="let category of categories">
+  Category {{category.category_id}}: {{ getParkingPlacesByCategoryId(category.category_id).totalPlaces }}
+</div>
+</div>
+
 <div *ngIf="parkingPlaces.length > 0">
     <h2>Parking places for Station {{stationId}}</h2> 
     <app-admin-parking-place *ngFor="let parkingPlace of parkingPlaces" [parkingPlace]="parkingPlace"></app-admin-parking-place>

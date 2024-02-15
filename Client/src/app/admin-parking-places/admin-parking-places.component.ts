@@ -90,6 +90,9 @@ export class AdminParkingPlacesComponent {
             this.message = "Parking place succesfully created!";
             this.parkingPlaceForm.reset();
             this.getParkingPlaces();
+            this.categories.forEach(category => {
+              this.getParkingPlacesByCategoryId(category.category_id);
+            });
           },
           (error: any) => {
             this.message = `Error posting parking place: ${error.error.message}`
@@ -99,5 +102,10 @@ export class AdminParkingPlacesComponent {
     } else {
       this.message = "Invalid data!!";
     }
+  }
+
+  getParkingPlacesByCategoryId(categoryId: string) {
+    const totalPlaces = this.parkingPlaces.filter(place => place.category_id === categoryId).length;
+    return { totalPlaces };
   }
 }
