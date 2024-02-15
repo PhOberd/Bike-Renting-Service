@@ -178,7 +178,8 @@ export class AdminIndividualBikeDetailsComponent implements OnInit {
       const selectedCategoryId = +this.selectedCategoryId;
     
       return this.parkingPlaces.filter(place => 
-        place.station_id === selectedStationId && place.category_id === selectedCategoryId && place.bike_id === null
+        place.station_id === selectedStationId && place.category_id === selectedCategoryId &&
+        (place.bike_id === null || place.bike_id === this.bikeDetails.bike_id)
       );
     }
 }
