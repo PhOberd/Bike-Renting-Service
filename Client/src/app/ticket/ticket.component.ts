@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as QRCode from 'qrcode';
 import { AuthService } from '../auth.service';
 import { TicketsService } from '../tickets.service';
@@ -28,8 +28,10 @@ export class TicketComponent implements OnInit {
   parkingPlaces: { station_id: number, number: number }[] = [];
   stations: number[] = [];
   parkingPlaceNumbers: number[] = [];
-  selectedStation: number = -1; // Set default value
-  selectedParkingPlace: number = -1; // Set default value
+  selectedStation: number = -1;
+  selectedParkingPlace: number = -1;
+
+  @Output() fetchRequest = new EventEmitter<any>();
 
   constructor(private authService: AuthService, private ticketsService: TicketsService,
     private walletService: WalletService, private bikeService: BikesService,
@@ -38,9 +40,13 @@ export class TicketComponent implements OnInit {
     ngOnInit(): void {
       const currentDate = new Date();
       const start_time = new Date(this.ticket.start_time);
+      const end_time = new Date(this.ticket.end_time);
     
       const startTimePlusOneHour = new Date(start_time.getTime());
       startTimePlusOneHour.setHours(start_time.getHours() + 1);
+
+      const endTimePlusOneHour = new Date(end_time.getTime());
+      endTimePlusOneHour.setHours(end_time.getHours() + 1);
     
       if (start_time > currentDate) {
         this.isReturnable = true;
@@ -50,6 +56,9 @@ export class TicketComponent implements OnInit {
     
       if (this.ticket.status === 'Inactive') {
         this.requestQR();
+        if (currentDate > endTimePlusOneHour) {
+          this.changeTicketStatusToNotUsed();
+        }
       } else if (this.ticket.status === 'Active') {
         this.fetchParkingPlaces();
       }
@@ -146,6 +155,21 @@ export class TicketComponent implements OnInit {
               this.addSuccessMessage("Succesfully returned the bike!")
             }
           );
+      },
+        (error) => {
+          console.error('Error changing Status:', error);
+        }
+      );
+    }
+  }
+  
+  changeTicketStatusToNotUsed(){
+    const token = this.authService.getToken();
+    if(token){
+      this.ticketsService.changeTicketStatus(token, this.ticket.ticket_id, "Not Used").subscribe(
+        (response) => {
+          this.ticket.status = "Not Used"
+          this.fetchRequest.emit();
       },
         (error) => {
           console.error('Error changing Status:', error);

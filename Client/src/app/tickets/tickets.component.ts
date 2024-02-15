@@ -33,4 +33,8 @@ export class TicketsComponent {
           }
       }
   }
+
+  onFetchRequested(){
+    this.fetchTickets();
   }
+}

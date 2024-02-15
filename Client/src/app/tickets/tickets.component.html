@@ -1,6 +1,6 @@
 <div *ngIf="tickets.length > 0">
       <h2>Your tickets</h2> 
-      <app-ticket *ngFor="let ticket of tickets" [ticket]="ticket"></app-ticket>
+      <app-ticket *ngFor="let ticket of tickets" [ticket]="ticket" (fetchRequest)="onFetchRequested()"></app-ticket>
     </div>
     <div *ngIf="tickets.length === 0">
       <p>No tickets found.</p>
