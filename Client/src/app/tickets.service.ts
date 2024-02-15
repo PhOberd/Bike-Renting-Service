@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,14 @@ export class TicketsService {
       'Authorization': token
     });
     return this.http.get<any>(`${this.baseUrl}booking-tickets`, { headers });
+  }
+
+  getOverdueTickets(token: string): Observable<any[]> {
+    const currentTime = new Date().getTime();
+    return this.getTickets(token).pipe(
+      map((tickets: any[]) => tickets.filter(ticket => ticket.status === 'Active'
+      && currentTime > new Date(ticket.end_time).getTime()))
+    );
   }
 
   postTicket(token: string, ticket: any): Observable<any> {

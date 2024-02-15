@@ -51,6 +51,40 @@ app.get('/wallet', checkAuth, async (req, res) => {
     }
 });
 
+app.patch('/wallet/:userId/reset', checkAuth, async (req, res) => {
+    if(!req.userData.isAdmin){
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    try{
+        const userId = req.params.userId;
+        const result = await pool.query('UPDATE users SET wallet = 0 WHERE user_id = $1', [userId]);
+        
+        const query = {
+            text: 'UPDATE users SET wallet = 0 WHERE user_id = $1',
+            values: [userId],
+          };
+        
+          pool.query(query, (err, result) => {
+            if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Failed to update wallet balance' });
+            } else {
+              if (result.rowCount === 1) {
+                console.log('Wallet balance updated successfully');
+                res.status(200).json({ message: 'Wallet balance updated successfully' });
+              } else {
+                console.error('User not found or no wallet balance updated');
+                res.status(404).json({ message: 'User not found or no wallet balance updated' });
+              }
+            }
+          });
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 app.post('/wallet/charge', checkAuth, async (req, res) => {
 
     try{
@@ -317,6 +351,9 @@ app.post('/categories', checkAuth, async (req, res) => {
             return res.status(400).json({ message: 'Invalid input data' });
         }
 
+
+        
+        
         
         const testQuery = {
             text: 'SELECT * FROM bike_categories WHERE name = $1',
@@ -1402,6 +1439,21 @@ app.get('/parking-places/:categoryId/free',checkAuth, async (req, res) => {
         let parking_places = [];
         const result = await pool.query(`SELECT station_id, number FROM parking_places WHERE category_id = $1 AND bike_id IS NULL`, 
         [categoryId]);
+
+        parking_places = result.rows;
+        res.json(parking_places);
+    }catch(error){
+        console.error('Error querying database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//get all parking places
+app.get('/parking-places',checkAuth, async (req, res) => {
+
+    try{
+        let parking_places = [];
+        const result = await pool.query(`SELECT * FROM parking_places`);
 
         parking_places = result.rows;
         res.json(parking_places);

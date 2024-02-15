@@ -15,6 +15,7 @@ import { AdminIndividualBikesComponent } from './admin-individual-bikes/admin-in
 import { AdminIndividualBikeDetailsComponent } from './admin-individual-bike-details/admin-individual-bike-details.component';
 import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { AdminGuard } from './AdminGuard';
+import { AdminOverdueTicketsComponent } from './admin-overdue-tickets/admin-overdue-tickets.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -31,5 +32,6 @@ export const routes: Routes = [
     { path: 'admin/models/:Id', component: AdminModelDetailsComponent, canActivate: [AdminGuard] },
     { path: 'admin/bikes', component: AdminIndividualBikesComponent, canActivate: [AdminGuard] },
     { path: 'admin/bikes/:Id', component: AdminIndividualBikeDetailsComponent, canActivate: [AdminGuard] },
+    { path: 'admin/overdue-tickets', component: AdminOverdueTicketsComponent, canActivate: [AdminGuard] },
     { path: 'access-denied', component: AccessDeniedComponent }
 ];

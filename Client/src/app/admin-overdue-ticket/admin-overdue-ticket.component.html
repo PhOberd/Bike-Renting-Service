@@ -1,0 +1,16 @@
+<div class="admin-overdue-ticket-container">
+    <p><strong>Model id:</strong> {{ticket.model_id}}</p>
+    <p><strong>User id:</strong> {{ticket.user_id}}</p>
+    <p><strong>Category id:</strong> {{ticket.category_id}}</p>
+    <p><strong>Station id:</strong> {{ticket.station_id}}</p>
+    <p><strong>Start time:</strong> {{ticket.start_time}}</p>
+    <p><strong>End time:</strong> {{ticket.end_time}}</p>
+    <p><strong>Ticket status:</strong> {{ticket.status}}</p>
+    <p><strong>Price:</strong> {{ticket.price}}</p>
+
+    <div *ngIf="message" class="message">
+        {{ message }}
+    </div>
+
+    <button type="button" *ngIf="canDoNastyThing" (click)="doNastyThing(ticket.user_id)">Do nasty thing</button>
+</div>

@@ -39,13 +39,12 @@ export class TicketComponent implements OnInit {
       const currentDate = new Date();
       const start_time = new Date(this.ticket.start_time);
     
-      // start_time is one hour behind current time
-      const oneHourAhead = new Date(start_time.getTime());
-      oneHourAhead.setHours(start_time.getHours() + 1);
+      const startTimePlusOneHour = new Date(start_time.getTime());
+      startTimePlusOneHour.setHours(start_time.getHours() + 1);
     
       if (start_time > currentDate) {
         this.isReturnable = true;
-      } else if (currentDate > oneHourAhead) {
+      } else if (currentDate > startTimePlusOneHour) {
         this.isUseable = true;
       }
     

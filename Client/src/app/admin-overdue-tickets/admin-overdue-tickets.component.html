@@ -1,0 +1,7 @@
+<div *ngIf="tickets.length > 0">
+    <h2>Overdue tickets</h2> 
+    <app-admin-overdue-ticket *ngFor="let ticket of tickets" [ticket]="ticket"></app-admin-overdue-ticket>
+  </div>
+  <div *ngIf="tickets.length === 0">
+    <p>No tickets found.</p>
+</div>

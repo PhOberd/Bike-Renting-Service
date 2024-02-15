@@ -58,6 +58,10 @@ export class NavBarComponent {
     this.router.navigateByUrl('admin/bikes');
   }
 
+  navigateToOverdueTickets(){
+    this.router.navigateByUrl('admin/overdue-tickets');
+  }
+
   isAdmin(): boolean{
     return this.authService.isAdmin();
   }

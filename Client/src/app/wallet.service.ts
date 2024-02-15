@@ -17,6 +17,13 @@ export class WalletService {
     return this.http.get<any>(this.walletUrl, { headers });
   }
 
+  getBalanceById(token: string, userId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.get<any>(`${this.walletUrl}/${userId}`, { headers });
+  }
+
   chargeBalance(token: string, amount: number): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': token
@@ -29,5 +36,12 @@ export class WalletService {
       'Authorization': token
     });
     return this.http.post<any>(`${this.walletUrl}/use`, { amount }, { headers });
+  }
+
+  resetBalanceById(token: string, userId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': token
+    });
+    return this.http.patch<any>(`${this.walletUrl}/${userId}/reset`, {}, { headers });
   }
 }

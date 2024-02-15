@@ -3,7 +3,6 @@ import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule  } from '@angular/forms';
-import { CategoryService } from '../category.service';
 import { ModelService } from '../model.service';
 import { AdminIndividualBikeComponent } from '../admin-individual-bike/admin-individual-bike.component';
 import { MapService } from '../map.service';
@@ -24,13 +23,13 @@ export class AdminIndividualBikesComponent implements OnInit {
   message = "";
 
   constructor(private formBuilder: FormBuilder,
-    private authService: AuthService, private categoryService: CategoryService, private router: Router,
-    private modelService: ModelService, private mapService: MapService, private bikesService: BikesService){
+    private authService: AuthService, private router: Router, private modelService: ModelService, 
+    private mapService: MapService, private bikesService: BikesService){
       this.bikeForm = this.formBuilder.group({
         model_id: ['', Validators.required],
         unique_id: ['', Validators.required],
         station_id: ['', Validators.required],
-        status: ['', Validators.required]
+        status: ['Free', Validators.required]
       });
   }
 
@@ -107,12 +106,12 @@ export class AdminIndividualBikesComponent implements OnInit {
       this.message = "Invalid data!";
     }
   }
-
+  
   onBikeClick(bikeId: number) {
     this.router.navigateByUrl(`/admin/bikes/${bikeId}`);
-    }
+  }
 
-    onFetchRequested() {
-      this.fetchBikes();
-    }
+  onFetchRequested() {
+    this.fetchBikes();
+  }
 }

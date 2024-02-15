@@ -8,7 +8,7 @@
     <form [formGroup]="bikeForm" (ngSubmit)="onSubmit()">
         <div>
             <label>Model:</label>
-            <select formControlName="model_id">
+            <select formControlName="model_id" (change)="onModelChange($event)">
                 <option *ngFor="let model of models" [value]="model.model_id">{{ model.model_id }}</option>
             </select>
         </div>
@@ -20,17 +20,27 @@
 
         <div>
             <label>Station:</label>
-            <select formControlName="station_id">
+            <select formControlName="station_id" (change)="onStationChange($event)">
                 <option *ngFor="let station of stations" [value]="station.station_id">{{ station.station_id }}</option>
             </select>
         </div>
 
         <div>
+            <label>Parking Place number:</label>
+            <select formControlName="number" (change)="onParkingPlaceChange($event)">
+                <option *ngFor="let parkingPlace of filteredParkingPlaces" [value]="parkingPlace.number">{{ parkingPlace.number }}</option>
+            </select>
+        </div>
+
+        <div>
             <label>Status:</label>
-            <input type="text" formControlName="status">
+            <input type="text" formControlName="status" [readonly]="true">
         </div>
     
       <button type="submit">Submit</button>
+      <div *ngIf="bikeDetails?.status === 'InUse'">
+        <p>Bike is in use, it is not encouraged to change details.</p>
+      </div> 
     </form>
 
     <div *ngIf="message" class="message">
